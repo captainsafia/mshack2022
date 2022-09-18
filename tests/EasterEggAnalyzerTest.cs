@@ -65,4 +65,14 @@ class Program
 }
 ");
     }
+
+    [Fact]
+    public async Task TriggersOnIntWith42_TopLevelStatements()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+[|int i = 42;|]
+", @"
+int meaningOfLife = 42;
+");
+    }
 }

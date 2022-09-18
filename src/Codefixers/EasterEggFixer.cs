@@ -41,7 +41,17 @@ public class EasterEggFixer : CodeFixProvider
         }
 
         var diagnosticTarget = root.FindNode(diagnostic.Location.SourceSpan);
-        if (diagnosticTarget is LocalDeclarationStatementSyntax localDeclarationStatement)
+        LocalDeclarationStatementSyntax? localDeclarationStatement = null;
+        if (diagnosticTarget is LocalDeclarationStatementSyntax lds)
+        {
+            localDeclarationStatement = lds;
+        } else if (diagnosticTarget is GlobalStatementSyntax globalStatement &&
+            globalStatement.Statement is LocalDeclarationStatementSyntax glds)
+        {
+            localDeclarationStatement = glds;
+        }
+
+        if (localDeclarationStatement is not null)
         {
             var declaration = localDeclarationStatement.Declaration;
             if (declaration.Variables.Count() > 1)

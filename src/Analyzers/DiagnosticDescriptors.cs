@@ -7,7 +7,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor MeaningOfLife = new(
         "MH001",
         "Found the meaning of life",
-        "Found a variable assigned to 42. Consider uing th 'MeaningOfLife' identifier",
+        "Found a variable assigned to 42. Consider uing the 'meaningOfLife' identifier",
         "Usage",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
