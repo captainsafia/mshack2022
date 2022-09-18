@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
 
 namespace MSHack2022.Analyzers;
 
@@ -29,7 +25,7 @@ public partial class EasterEggAnalyzer : DiagnosticAnalyzer
             {
                 var initializer = variable.Initializer;
                 var identifierName = variable.Identifier;
-                var value = initializer.Value;
+                var value = initializer?.Value;
                 if (value is LiteralExpressionSyntax literalExpression
                     && literalExpression.Token.Text == "42"
                     && identifierName.Text != "meaningOfLife")

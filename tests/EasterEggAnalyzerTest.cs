@@ -1,8 +1,10 @@
-using Xunit;
 using System.Threading.Tasks;
+using Xunit;
 using VerifyCS = MSHack2022.Tests.CSharpCodeFixVerifier<
     MSHack2022.Analyzers.EasterEggAnalyzer,
     MSHack2022.Codefixers.EasterEggFixer>;
+
+namespace MSHack2022.Tests;
 
 public partial class EasterEggAnalyzerTest
 {
@@ -61,14 +63,6 @@ class Program
         int i = 39;
     }
 }
-");
-    }
-
-    [Fact]
-    public async Task TriggersOnIntWith42_TopLevelStatements()
-    {
-        await VerifyCS.VerifyAnalyzerAsync(@"
-[|int i = 42;|]
 ");
     }
 }
