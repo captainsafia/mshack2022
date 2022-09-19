@@ -10,4 +10,10 @@ app.MapGet("/mh001", () =>
     return "Hello world!";
 });
 
+app.MapGet("/mh004", (HttpContext context) =>
+{
+    var hostEnvironment = context.RequestServices.GetRequiredService<IHostEnvironment>();
+    return $"Hello from application '{hostEnvironment.ApplicationName}'!";
+});
+
 app.Run();
