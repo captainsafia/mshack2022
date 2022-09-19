@@ -9,5 +9,6 @@
 		<ProjectReference Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj"
 						  ReferenceOutputAssembly="false"
 						  OutputItemType="Analyzer" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
 	</ItemGroup>
 </Project>

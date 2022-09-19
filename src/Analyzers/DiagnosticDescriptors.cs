@@ -11,4 +11,12 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor UseDotnetUserJwtsTool = new(
+        "MH003",
+        "Recommend using dotnet user-jwts tool",
+        "It looks like you're using JWT-bearer based authentication in your application. Consider using the `dotnet user-jwts` tool to generate tokens for local development.",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
 }

@@ -1,4 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication().AddJwtBearer();
+
 var app = builder.Build();
 
 app.MapGet("/mh001", () => 
