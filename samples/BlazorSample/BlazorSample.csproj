@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<ProjectReference
-		Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj"
-		ReferenceOutputAssembly="false"
-		OutputItemType="Analyzer" />
+    <ProjectReference
+        Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj"
+        ReferenceOutputAssembly="false"
+        OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>
