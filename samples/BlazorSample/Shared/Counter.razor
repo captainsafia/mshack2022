@@ -4,30 +4,30 @@
 
 @code {
     [Parameter]
-    public int IncrementAmount { get; set; } = 0;
+    public int IncrementAmount { get; set; } = 1;
 
-    private int NonParameterProperty { get; set; } = 420;
+    private int NonParameterProperty { get; set; } = 0;
 
     private int currentCount = 0;
 
     public Counter()
     {
         // Should not report a diagnostic since assignment in the constructor is legal.
-        IncrementAmount = 69;
+        IncrementAmount = 2;
     }
 
     public override Task SetParametersAsync(ParameterView parameters)
     {
         // Should not report a diagnostic since assignment in SetParametersAsync() is legal.
-        IncrementAmount = 420;
+        IncrementAmount = 3;
         return base.SetParametersAsync(parameters);
     }
 
     private void IncrementCount()
     {
         // Should report a diagnostic.
-        IncrementAmount = 2;
-        IncrementAmount += 5;
+        //IncrementAmount = 4;
+        //IncrementAmount += 5;
 
         // Should not report a diagnostic since NonParameterProperty is not a parameter.
         NonParameterProperty = 5;

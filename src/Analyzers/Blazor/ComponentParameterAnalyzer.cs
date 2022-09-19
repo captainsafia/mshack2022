@@ -15,39 +15,44 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.EnableConcurrentExecution();
-        context.RegisterOperationAction(static operationActionAnalysisContext =>
+        context.RegisterCompilationStartAction(compilationStartAnalysisContext =>
         {
-            var compilation = operationActionAnalysisContext.Compilation;
+            var compilation = compilationStartAnalysisContext.Compilation;
 
             if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes))
             {
-                // Not in a Blazor project.
                 return;
             }
 
-            var containingSymbol = operationActionAnalysisContext.ContainingSymbol;
-            var containingType = containingSymbol.ContainingType;
-
-            if (!SymbolEqualityComparer.Default.Equals(wellKnownTypes.ComponentBase, containingType?.BaseType))
+            compilationStartAnalysisContext.RegisterOperationAction(static operationActionAnalysisContext =>
             {
-                // Not a Razor component extending "ComponentBase".
-                // TODO: Handle the case where the "ComponentBase" type is higher up in the type heirarchy.
-                return;
-            }
+                var compilation = operationActionAnalysisContext.Compilation;
 
-            var operation = operationActionAnalysisContext.Operation;
+                if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes))
+                {
+                    return;
+                }
 
-            if (!ShouldContainingSymbolPermitParameterWriting(containingSymbol, wellKnownTypes) &&
-                operation is IAssignmentOperation assignment &&
-                assignment.Target is IPropertyReferenceOperation propertyReference &&
-                IsParameterProperty(propertyReference.Property, wellKnownTypes))
-            {
-                operationActionAnalysisContext.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.ComponentsShouldNotWriteToTheirOwnParameters,
-                    propertyReference.Syntax.GetLocation(),
-                    propertyReference.Property.Name));
-            }
-        }, OperationKind.SimpleAssignment, OperationKind.CompoundAssignment, OperationKind.CoalesceAssignment);
+                var containingSymbol = operationActionAnalysisContext.ContainingSymbol;
+                var containingType = containingSymbol.ContainingType;
+
+                if (!wellKnownTypes.ComponentBase.IsBaseTypeOf(containingType))
+                {
+                    return;
+                }
+
+                if (operationActionAnalysisContext.Operation is IAssignmentOperation assignment &&
+                    assignment.Target is IPropertyReferenceOperation propertyReference &&
+                    IsParameterProperty(propertyReference.Property, wellKnownTypes) &&
+                    !ShouldContainingSymbolPermitParameterWriting(containingSymbol, wellKnownTypes))
+                {
+                    operationActionAnalysisContext.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.ComponentsShouldNotWriteToTheirOwnParameters,
+                        assignment.Syntax.GetLocation(),
+                        propertyReference.Property.Name));
+                }
+            }, OperationKind.SimpleAssignment, OperationKind.CompoundAssignment, OperationKind.CoalesceAssignment);
+        });
     }
 
     private static bool ShouldContainingSymbolPermitParameterWriting(ISymbol containingSymbol, WellKnownTypes wellKnownTypes)
@@ -62,7 +67,7 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
             return true;
         }
 
-        if (SymbolEqualityComparer.Default.Equals(wellKnownTypes.SetParametersAsync, methodSymbol.OverriddenMethod))
+        if (wellKnownTypes.SetParametersAsync.IsOverriddenBy(methodSymbol))
         {
             return true;
         }
