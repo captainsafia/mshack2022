@@ -19,4 +19,12 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor BadArgumentModifier = new(
+        "MH005",
+        "Found an invalid modifier on an argument",
+        "Found an argument with an invalid modifier like 'out', 'ref', or 'in'. Remove the modifier.",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }
