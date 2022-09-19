@@ -24,16 +24,9 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
-            compilationStartAnalysisContext.RegisterOperationAction(static operationActionAnalysisContext =>
+            compilationStartAnalysisContext.RegisterOperationAction(operationAnalysisContext =>
             {
-                var compilation = operationActionAnalysisContext.Compilation;
-
-                if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes))
-                {
-                    return;
-                }
-
-                var containingSymbol = operationActionAnalysisContext.ContainingSymbol;
+                var containingSymbol = operationAnalysisContext.ContainingSymbol;
                 var containingType = containingSymbol.ContainingType;
 
                 if (!wellKnownTypes.ComponentBase.IsBaseTypeOf(containingType))
@@ -41,12 +34,12 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
                     return;
                 }
 
-                if (operationActionAnalysisContext.Operation is IAssignmentOperation assignment &&
+                if (operationAnalysisContext.Operation is IAssignmentOperation assignment &&
                     assignment.Target is IPropertyReferenceOperation propertyReference &&
                     IsParameterProperty(propertyReference.Property, wellKnownTypes) &&
                     !ShouldContainingSymbolPermitParameterWriting(containingSymbol, wellKnownTypes))
                 {
-                    operationActionAnalysisContext.ReportDiagnostic(Diagnostic.Create(
+                    operationAnalysisContext.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.ComponentsShouldNotWriteToTheirOwnParameters,
                         assignment.Syntax.GetLocation(),
                         propertyReference.Property.Name));
