@@ -1,10 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace MSHack2022.Analyzers
 {
     internal sealed class WellKnownTypes
+    // This is private. We initialize all the properties when TryCreate returns true.
     {
-        public static bool TryCreate(Compilation compilation, out WellKnownTypes? wellKnownTypes)
+        public static bool TryCreate(Compilation compilation, [NotNullWhen(true)] out WellKnownTypes? wellKnownTypes)
         {
             wellKnownTypes = default;
             const string EndpointRouteBuilderExtensions = "Microsoft.AspNetCore.Builder.EndpointRouteBuilderExtensions";
@@ -19,8 +21,14 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
-            const string IResult = "Microsoft.AspNetCore.Http.IResult";
-            if (compilation.GetTypeByMetadataName(IResult) is not { } iResult)
+            const string IServiceProvider = "System.IServiceProvider";
+            if (compilation.GetTypeByMetadataName(IServiceProvider) is not { } iServiceProvider)
+            {
+                return false;
+            }
+
+            const string ServiceProviderServiceExtensions = "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions";
+            if (compilation.GetTypeByMetadataName(ServiceProviderServiceExtensions) is not { } serviceProviderExtensions)
             {
                 return false;
             }
@@ -35,8 +43,9 @@ namespace MSHack2022.Analyzers
             {
                 EndpointRouteBuilderExtensions = endpointRouteBuilderExtensions,
                 Delegate = @delegate,
-                IResult = iResult,
-                JwtBearerExtensions = jwtBearerExtensions
+                IServiceProvider = iServiceProvider,
+                ServiceProviderExtensions = serviceProviderExtensions,
+                JwtBearerExtensions = jwtBearerExtensions,
             };
 
             return true;
@@ -44,7 +53,8 @@ namespace MSHack2022.Analyzers
 
         public INamedTypeSymbol EndpointRouteBuilderExtensions { get; private set; } = null!;
         public INamedTypeSymbol Delegate { get; private set; } = null!;
-        public INamedTypeSymbol IResult { get; private set; } = null!;
+        public INamedTypeSymbol IServiceProvider { get; private set; } = null!;
+        public INamedTypeSymbol ServiceProviderExtensions { get; private set; } = null!;
         public INamedTypeSymbol JwtBearerExtensions { get; private set; } = null!;
     }
 }

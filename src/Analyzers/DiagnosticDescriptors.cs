@@ -7,7 +7,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor MeaningOfLife = new(
         "MH001",
         "Found the meaning of life",
-        "Found a variable assigned to 42. Consider using the 'meaningOfLife' identifier",
+        "Found a variable assigned to 42. Consider using the 'meaningOfLife' identifier.",
         "Usage",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
@@ -24,6 +24,14 @@ public static class DiagnosticDescriptors
         "MH003",
         "Recommend using dotnet user-jwts tool",
         "It looks like you're using JWT-bearer based authentication in your application. Consider using the `dotnet user-jwts` tool to generate tokens for local development.",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor GetService = new(
+        "MH004",
+        "Found call to GetService or GetRequiredService",
+        "Found call to GetService or GetRequiredService. Consider using a parameter instead.",
         "Usage",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
