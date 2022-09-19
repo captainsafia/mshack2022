@@ -156,6 +156,56 @@ class Program
     }
 
     [Fact]
+    public async Task TriggersOnMultipleParametersWithModifiersFromMethod()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", Out);
+    }
+
+    static string Out(ref string {|#0:s|}, in string {|#1:s2|})
+    {
+        return ""Hello world!"";
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.BadArgumentModifier).WithLocation(0),
+   new DiagnosticResult(DiagnosticDescriptors.BadArgumentModifier).WithLocation(1));
+    }
+
+    [Fact]
+    public async Task TriggersOnMultipleParametersWithModifiersFromLambda()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", (ref string {|#0:s|}, in string {|#1:s2|}) =>
+        {
+            return ""Hello world!"";
+        });
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.BadArgumentModifier).WithLocation(0),
+   new DiagnosticResult(DiagnosticDescriptors.BadArgumentModifier).WithLocation(1));
+    }
+
+    [Fact]
     public async Task DoesNotTriggersOnNormalParam()
     {
         await VerifyCS.VerifyAnalyzerAsync(@"
