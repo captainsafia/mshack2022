@@ -11,7 +11,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.4.0-1.final" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4-beta1.22403.2" />
