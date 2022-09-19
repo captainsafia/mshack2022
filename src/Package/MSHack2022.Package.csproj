@@ -21,6 +21,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4-beta1.22403.2" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Analyzers\MSHack2022.Analyzers.csproj" />
 		<ProjectReference Include="..\Codefixers\MSHack2022.Codefixers.csproj" />
 	</ItemGroup>
