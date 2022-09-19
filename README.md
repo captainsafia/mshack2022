@@ -8,6 +8,7 @@ This repository contains a collection of analyzers developed during MSHack 2022,
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MH001         | Just an easter egg analyzer. Finds instances where an integer variable is assigned to 42 and recommends renaming the identifier to `meaningOfLife`. |
 | MH002         | Emits a warning when a Razor component writes to one of its parameter properties directly.                                                          |
+| MH003         | Recommends that the user leverage the `dotnet user-jwts` command line tool when they are using JWT-bearer based auth. |
 | MH005         | Finds 'out', 'in', or 'ref' modifiers on arguments in request delegates. |
 
 ## Development Instructions

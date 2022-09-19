@@ -10,4 +10,8 @@
 						  ReferenceOutputAssembly="false"
 						  OutputItemType="Analyzer" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
+	</ItemGroup>
 </Project>

@@ -25,11 +25,18 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
+            const string JwtBearerExtensions = "Microsoft.Extensions.DependencyInjection.JwtBearerExtensions";
+            if (compilation.GetTypeByMetadataName(JwtBearerExtensions) is not { } jwtBearerExtensions)
+            {
+                return false;
+            }
+
             wellKnownTypes = new WellKnownTypes
             {
                 EndpointRouteBuilderExtensions = endpointRouteBuilderExtensions,
                 Delegate = @delegate,
                 IResult = iResult,
+                JwtBearerExtensions = jwtBearerExtensions
             };
 
             return true;
@@ -38,5 +45,6 @@ namespace MSHack2022.Analyzers
         public INamedTypeSymbol EndpointRouteBuilderExtensions { get; private set; } = null!;
         public INamedTypeSymbol Delegate { get; private set; } = null!;
         public INamedTypeSymbol IResult { get; private set; } = null!;
+        public INamedTypeSymbol JwtBearerExtensions { get; private set; } = null!;
     }
 }
