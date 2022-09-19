@@ -63,6 +63,8 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
             TrimAssemblyExtension(typeof(Microsoft.Extensions.Configuration.JsonConfigurationExtensions).Assembly.Location),
             TrimAssemblyExtension(typeof(Microsoft.Extensions.Configuration.IConfigurationBuilder).Assembly.Location),
             TrimAssemblyExtension(typeof(Microsoft.Extensions.Configuration.EnvironmentVariablesExtensions).Assembly.Location),
+            TrimAssemblyExtension(typeof(Microsoft.Extensions.DependencyInjection.JwtBearerExtensions).Assembly.Location),
+            TrimAssemblyExtension(typeof(Microsoft.Extensions.DependencyInjection.AuthenticationServiceCollectionExtensions).Assembly.Location),
             TrimAssemblyExtension(typeof(Microsoft.JSInterop.IJSRuntime).Assembly.Location)));
     }
 

@@ -20,6 +20,22 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
+    public static readonly DiagnosticDescriptor UseDotnetUserJwtsTool = new(
+        "MH003",
+        "Recommend using dotnet user-jwts tool",
+        "It looks like you're using JWT-bearer based authentication in your application. Consider using the `dotnet user-jwts` tool to generate tokens for local development.",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor BadArgumentModifier = new(
+        "MH005",
+        "Found an invalid modifier on an argument",
+        "Found an argument with an invalid modifier like 'out', 'ref', or 'in'. Remove the modifier.",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
     public static readonly DiagnosticDescriptor ShouldNotPerformJsInteropInOnInitializedAsync = new(
         "MH007",
         "JavaScript interop should not be performed within 'OnInitializedAsync()'",

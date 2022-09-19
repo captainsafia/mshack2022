@@ -6,7 +6,7 @@ using VerifyCS = MSHack2022.Tests.CSharpCodeFixVerifier<
 
 namespace MSHack2022.Tests;
 
-public partial class EasterEggAnalyzerTest
+public class EasterEggAnalyzerTest
 {
     [Fact]
     public async Task TriggersOnIntWith42()
