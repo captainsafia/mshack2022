@@ -45,7 +45,8 @@ public class EasterEggFixer : CodeFixProvider
         if (diagnosticTarget is LocalDeclarationStatementSyntax lds)
         {
             localDeclarationStatement = lds;
-        } else if (diagnosticTarget is GlobalStatementSyntax globalStatement &&
+        }
+        else if (diagnosticTarget is GlobalStatementSyntax globalStatement &&
             globalStatement.Statement is LocalDeclarationStatementSyntax glds)
         {
             localDeclarationStatement = glds;
