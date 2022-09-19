@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj"
+						ReferenceOutputAssembly="false"
+						OutputItemType="Analyzer"/>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,32 @@
+﻿<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    [Parameter]
+    public int IncrementAmount { get; set; } = 0;
+
+    private int NonParameterProperty { get; set; } = 420;
+
+    private int currentCount = 0;
+
+    public Incrementor()
+    {
+        // Should not report a diagnostic since assignment in the constructor is legal.
+        IncrementAmount = 69;
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        IncrementAmount = 420;
+        return base.SetParametersAsync(parameters);
+    }
+
+    private void IncrementCount()
+    {
+        IncrementAmount = 2;
+        IncrementAmount += 5;
+        NonParameterProperty = 5;
+        currentCount += IncrementAmount;
+    }
+}
