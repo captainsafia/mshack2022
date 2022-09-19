@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MSHack2022.Analyzers.Blazor;
 
-internal class WellKnownTypes
+internal sealed class WellKnownTypes
 {
     public INamedTypeSymbol ComponentBase { get; private init; } = default!;
     public INamedTypeSymbol ParameterAttribute { get; private init; } = default!;
