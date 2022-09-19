@@ -11,4 +11,12 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ComponentsShouldNotWriteToTheirOwnParameters = new(
+        "MH002",
+        "Components should not write to their own parameters",
+        "The parameter '{0}' is being written to from its defining component",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }

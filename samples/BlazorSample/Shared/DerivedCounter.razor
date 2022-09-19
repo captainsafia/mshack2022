@@ -1,0 +1,18 @@
+﻿@inherits Counter
+
+<h3>DerivedCounter</h3>
+
+@code {
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        // Should not report a diagnostic.
+        IncrementAmount = 0;
+        return base.SetParametersAsync(parameters);
+    }
+
+    void Foo()
+    {
+        // Should report a diagnostic.
+        //IncrementAmount += 1;
+    }
+}
