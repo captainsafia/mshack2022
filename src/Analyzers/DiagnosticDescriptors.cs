@@ -43,4 +43,13 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ShouldNotPerformJsInteropInOnInitializedAsync = new(
+        "MH007",
+        "JavaScript interop should not be performed within 'OnInitializedAsync()'",
+        "The 'OnInitializedAsync()' method may get called during prerendering, when JavaScript " +
+        "interop is not available. Please move this call to 'OnAfterRenderAsync(bool firstRender)'.",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }

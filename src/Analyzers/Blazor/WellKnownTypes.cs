@@ -8,6 +8,8 @@ internal sealed class WellKnownTypes
     public INamedTypeSymbol ComponentBase { get; private init; } = default!;
     public INamedTypeSymbol ParameterAttribute { get; private init; } = default!;
     public IMethodSymbol SetParametersAsync { get; private init; } = default!;
+    public IMethodSymbol OnInitializedAsync { get; private init; } = default!;
+    public INamedTypeSymbol IJSRuntime { get; private init; } = default!;
 
     public static bool TryCreate(Compilation compilation, [NotNullWhen(returnValue: true)] out WellKnownTypes? result)
     {
@@ -31,11 +33,25 @@ internal sealed class WellKnownTypes
             return false;
         }
 
+        const string OnInitializedAsync = "OnInitializedAsync";
+        if (componentBase.GetMembers().FirstOrDefault(m => m.MetadataName == OnInitializedAsync) is not IMethodSymbol onInitializedAsync)
+        {
+            return false;
+        }
+
+        const string IJSRuntime = "Microsoft.JSInterop.IJSRuntime";
+        if (compilation.GetTypeByMetadataName(IJSRuntime) is not { } iJSRuntime)
+        {
+            return false;
+        }
+
         result = new()
         {
             ComponentBase = componentBase,
             ParameterAttribute = parameterAttribute,
             SetParametersAsync = setParametersAsync,
+            OnInitializedAsync = onInitializedAsync,
+            IJSRuntime = iJSRuntime,
         };
         return true;
     }
