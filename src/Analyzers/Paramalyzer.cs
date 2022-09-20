@@ -2,10 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
-using MSHack2022.Analyzers.Blazor;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Reflection.Metadata;
 
 namespace MSHack2022.Analyzers;
 
@@ -58,24 +56,22 @@ public partial class ParamalyzerAnalyzer : DiagnosticAnalyzer
                 if (delegateCreation.Target.Kind == OperationKind.AnonymousFunction)
                 {
                     var lambda = (IAnonymousFunctionOperation)delegateCreation.Target;
-                    DetectArgumentModifiers(in context, wellKnownTypes!, invocation, lambda.Symbol);
-                    DetectRouteValueUsageLambda(in context, wellKnownTypes!, invocation, lambda.Symbol);
-                    DetectRefReturnTypes(in context, wellKnownTypes!, invocation, lambda.Symbol);
+                    DetectArgumentModifiers(in context, lambda.Symbol);
+                    DetectRouteValueUsageLambda(in context, invocation);
+                    DetectRefReturnTypes(in context, invocation, lambda.Symbol);
                 }
                 else if (delegateCreation.Target.Kind == OperationKind.MethodReference)
                 {
                     var methodReference = (IMethodReferenceOperation)delegateCreation.Target;
-                    DetectArgumentModifiers(in context, wellKnownTypes!, invocation, methodReference.Method);
-                    DetectRouteValueUsageMethod(in context, wellKnownTypes!, invocation, methodReference.Method);
-                    DetectRefReturnTypes(in context, wellKnownTypes!, invocation, methodReference.Method);
+                    DetectArgumentModifiers(in context, methodReference.Method);
+                    DetectRouteValueUsageMethod(in context, invocation, methodReference.Method);
+                    DetectRefReturnTypes(in context, invocation, methodReference.Method);
                 }
             }, OperationKind.Invocation);
         });
     }
 
     private void DetectArgumentModifiers(in OperationAnalysisContext context,
-        WellKnownTypes wellKnownTypes,
-        IInvocationOperation invocation,
         IMethodSymbol methodSymbol)
     {
         foreach (var parameter in methodSymbol.Parameters)
@@ -88,7 +84,6 @@ public partial class ParamalyzerAnalyzer : DiagnosticAnalyzer
     }
 
     private void DetectRefReturnTypes(in OperationAnalysisContext context,
-        WellKnownTypes wellKnownTypes,
         IInvocationOperation invocation,
         IMethodSymbol methodSymbol)
     {
@@ -129,9 +124,7 @@ public partial class ParamalyzerAnalyzer : DiagnosticAnalyzer
     }
 
     private void DetectRouteValueUsageLambda(in OperationAnalysisContext context,
-        WellKnownTypes wellKnownTypes,
-        IInvocationOperation invocation,
-        IMethodSymbol methodSymbol)
+        IInvocationOperation invocation)
     {
         foreach (var propertyRef in invocation.Descendants().OfType<IPropertyReferenceOperation>())
         {
@@ -143,13 +136,12 @@ public partial class ParamalyzerAnalyzer : DiagnosticAnalyzer
             var routeValue = propertyRef.Arguments[0].Value.Syntax.GetFirstToken().Value;
 
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.ExplicitRouteValue,
-                ((MemberAccessExpressionSyntax)propertyRef.Instance.Syntax).Name.GetLocation(),
+                ((MemberAccessExpressionSyntax)propertyRef.Instance!.Syntax).Name.GetLocation(),
                 routeValue));
         }
     }
 
     private void DetectRouteValueUsageMethod(in OperationAnalysisContext context,
-        WellKnownTypes wellKnownTypes,
         IInvocationOperation invocation,
         IMethodSymbol methodSymbol)
     {
@@ -183,7 +175,7 @@ public partial class ParamalyzerAnalyzer : DiagnosticAnalyzer
     {
         var syntaxReference = methodSymbol.DeclaringSyntaxReferences.Single();
         var syntaxNode = syntaxReference.GetSyntax(context.CancellationToken);
-        var methodOperation = syntaxNode.SyntaxTree == invocation.SemanticModel.SyntaxTree
+        var methodOperation = syntaxNode.SyntaxTree == invocation.SemanticModel!.SyntaxTree
             ? invocation.SemanticModel.GetOperation(syntaxNode, context.CancellationToken)
             : null;
         if (methodOperation is ILocalFunctionOperation { Body: not null } localFunction)
