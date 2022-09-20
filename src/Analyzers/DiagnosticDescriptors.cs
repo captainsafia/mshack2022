@@ -60,4 +60,13 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor EventCallbackCapturingForLoopIteratorVariable = new(
+        "MH009",
+        "An EventCallback is capturing a for loop iteration variable",
+        "The for loop iteration variable '{0}' is being captured in an EventCallback. " +
+        "Consider copying '{0}' into a local variable to avoid this capture.",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }

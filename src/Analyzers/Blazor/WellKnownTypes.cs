@@ -10,6 +10,7 @@ internal sealed class WellKnownTypes
     public IMethodSymbol SetParametersAsync { get; private init; } = default!;
     public IMethodSymbol OnInitializedAsync { get; private init; } = default!;
     public INamedTypeSymbol IJSRuntime { get; private init; } = default!;
+    public INamedTypeSymbol EventCallbackFactory { get; private init; } = default!;
 
     public static bool TryCreate(Compilation compilation, [NotNullWhen(returnValue: true)] out WellKnownTypes? result)
     {
@@ -45,6 +46,12 @@ internal sealed class WellKnownTypes
             return false;
         }
 
+        const string EventCallbackFactory = "Microsoft.AspNetCore.Components.EventCallbackFactory";
+        if (compilation.GetTypeByMetadataName(EventCallbackFactory) is not { } eventCallbackFactory)
+        {
+            return false;
+        }
+
         result = new()
         {
             ComponentBase = componentBase,
@@ -52,6 +59,7 @@ internal sealed class WellKnownTypes
             SetParametersAsync = setParametersAsync,
             OnInitializedAsync = onInitializedAsync,
             IJSRuntime = iJSRuntime,
+            EventCallbackFactory = eventCallbackFactory,
         };
         return true;
     }
