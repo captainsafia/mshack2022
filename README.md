@@ -12,6 +12,7 @@ This repository contains a collection of analyzers developed during MSHack 2022,
 | MH005         | Finds 'out', 'in', or 'ref' modifiers on arguments in request delegates. |
 | MH006         | Code fixer that adds a call to `WithName("SuggestedApiName")` to an endpoint mapping declaration |
 | MH007         | Emits a warning when JS interop is performed within the 'OnInitializedAsync()' method in a Razor component. |
+| MH008         | Recommends that users leverage route groups for multiple routes that share the same prefix. |
 
 ## Development Instructions
 
