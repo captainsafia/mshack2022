@@ -6,12 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj"
-                      ReferenceOutputAssembly="false"
-                      OutputItemType="Analyzer" />
-    <ProjectReference Include="..\..\src\Codefixers\MSHack2022.Codefixers.csproj"
-                      ReferenceOutputAssembly="false"
-                      OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Codefixers\MSHack2022.Codefixers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\WebSample.HealthChecks\WebSample.HealthChecks.csproj" />
+    <ProjectReference Include="..\..\WebSample.Shared\WebSample.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
