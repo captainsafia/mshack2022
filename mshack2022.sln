@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSample", "samples\WebSam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSHack2022.Tests", "tests\MSHack2022.Tests.csproj", "{D4B5340C-DB22-4D93-A631-C265583E0261}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSample", "samples\BlazorSample\BlazorSample.csproj", "{63BD1A26-29ED-48AF-A646-06F9D74DD13F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorSample", "samples\BlazorSample\BlazorSample.csproj", "{63BD1A26-29ED-48AF-A646-06F9D74DD13F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSHack2022.Vsix", "src\Vsix\MSHack2022.Vsix.csproj", "{7BB3B46B-7984-4755-8BBB-591FCADADFD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{63BD1A26-29ED-48AF-A646-06F9D74DD13F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63BD1A26-29ED-48AF-A646-06F9D74DD13F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63BD1A26-29ED-48AF-A646-06F9D74DD13F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BB3B46B-7984-4755-8BBB-591FCADADFD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BB3B46B-7984-4755-8BBB-591FCADADFD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BB3B46B-7984-4755-8BBB-591FCADADFD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BB3B46B-7984-4755-8BBB-591FCADADFD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{84A98762-6D93-44B8-B02D-9CA94763453D} = {4D043F42-F942-4CD8-AD50-99755F44DCCE}
 		{CC1176B2-0644-4013-82DA-37A6B8DA0CE8} = {73E56F0C-E6DE-4162-8610-5CD6ACB21958}
 		{63BD1A26-29ED-48AF-A646-06F9D74DD13F} = {73E56F0C-E6DE-4162-8610-5CD6ACB21958}
+		{7BB3B46B-7984-4755-8BBB-591FCADADFD0} = {4D043F42-F942-4CD8-AD50-99755F44DCCE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B03A45E7-049F-4BEA-A98F-5F3E9A572036}

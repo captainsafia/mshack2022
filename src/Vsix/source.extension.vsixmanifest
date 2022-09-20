@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="MSHack2022.Vsix.efb82023-a06d-48bb-a5d4-f8795d49a7c6" Version="1.0" Language="en-US" Publisher="Francesco Bonacci" />
+    <DisplayName>MSHack2022.Vsix</DisplayName>
+    <Description>Empty VSIX Project.</Description>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Prerequisites>
+  	<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+  	<Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.LanguageServices" Version="[17.0,18.0)" DisplayName="Roslyn Language Services" />
+  </Prerequisites>
+  <Assets>
+	  <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="MSHack2022.Analyzers" Path="|MSHack2022.Analyzers|"/>
+	  <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="MSHack2022.Analyzers" Path="|MSHack2022.Analyzers|"/>
+	  <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="MSHack2022.CodeFixers" Path="|MSHack2022.CodeFixers|"/>
+	  <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="MSHack2022.CodeFixers" Path="|MSHack2022.CodeFixers|"/>
+  </Assets>
+</PackageManifest>
