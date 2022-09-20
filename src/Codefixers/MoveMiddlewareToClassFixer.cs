@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Tags;
 using MSHack2022.Analyzers;
 using System.Collections.Immutable;
 using System.Composition;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace MSHack2022.Codefixers;
 
@@ -36,7 +37,7 @@ public class MoveMiddlewareToClassFixer : CodeFixProvider
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
-        if (root == null)
+        if (root is null)
         {
             return document;
         }
@@ -45,18 +46,89 @@ public class MoveMiddlewareToClassFixer : CodeFixProvider
         
         if (diagnosticTarget is InvocationExpressionSyntax invocationExpression)
         {
-            var suggestedApiName = diagnostic.Properties["SuggestedApiName"] ?? "MyApi";
+            var compilationUnit = diagnosticTarget.FirstAncestorOrSelf<CompilationUnitSyntax>();
 
-            var withNameMemberAccess = SyntaxFactory.MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression, invocationExpression, SyntaxFactory.IdentifierName("WithName"));
-            var withNameInvocation = SyntaxFactory.InvocationExpression(
-                withNameMemberAccess, SyntaxFactory.ArgumentList(
-                    SyntaxFactory.SeparatedList(new[] {
-                        SyntaxFactory.Argument(
-                            SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(suggestedApiName)))
-                    })));
+            if (compilationUnit is null)
+            {
+                return document;
+            }
 
-            return document.WithSyntaxRoot(root.ReplaceNode(invocationExpression, withNameInvocation));
+            // TODO: Check for name collisions
+            var middlewareClassName = "Middleware1";
+
+            // app.UseMiddleware1();
+            var registerMiddlewareInvocation = ExpressionStatement(
+                InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("app"),
+                        IdentifierName($"Use{middlewareClassName}"))));
+
+            // TODO: Support hoisting closures to middleware constructor arguments
+
+            var middlewareClassDeclarations =  List(new MemberDeclarationSyntax[] {
+                // internal class Middleware1
+                ClassDeclaration(middlewareClassName)
+                    .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword)))
+                    .WithMembers(List(new MemberDeclarationSyntax[]{
+                        // private readonly RequestDelegate _next;
+                        FieldDeclaration(
+                            VariableDeclaration(IdentifierName("RequestDelegate"))
+                                .WithVariables(SingletonSeparatedList(VariableDeclarator(Identifier("_next")))))
+                            .WithModifiers(TokenList(new [] { Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.ReadOnlyKeyword)})),
+                        // public Middleware1(RequestDelegate next)
+                        ConstructorDeclaration(Identifier(middlewareClassName))
+                            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                            .WithParameterList(ParameterList(SingletonSeparatedList(
+                                    Parameter(Identifier("next")).WithType(IdentifierName("RequestDelegate")))))
+                            .WithBody(Block(SingletonList<StatementSyntax>(
+                                ExpressionStatement(
+                                    AssignmentExpression(
+                                        SyntaxKind.SimpleAssignmentExpression,
+                                        IdentifierName("_next"),
+                                        IdentifierName("next")))))),
+                        // public Task InvokeAsync(HttpContext context)
+                        MethodDeclaration(IdentifierName("Task"), Identifier("InvokeAsync"))
+                            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                            .WithParameterList(ParameterList(SingletonSeparatedList(
+                                Parameter(Identifier("context")).WithType(IdentifierName("HttpContext")))))
+                            .WithBody(Block(SingletonList<StatementSyntax>(
+                                ReturnStatement(
+                                    InvocationExpression(IdentifierName("_next"))
+                                        .WithArgumentList(ArgumentList(SingletonSeparatedList(
+                                            Argument(IdentifierName("context")))))))))})),
+                // internal static class Middleware1Extensions
+                ClassDeclaration($"{middlewareClassName}Extensions")
+                    .WithModifiers(TokenList(new [] {
+                        Token(SyntaxKind.InternalKeyword),
+                        Token(SyntaxKind.StaticKeyword)}))
+                    .WithMembers(SingletonList<MemberDeclarationSyntax>(
+                        // public static IApplicationBuilder UseMiddleware2(this IApplicationBuilder builder)
+                        MethodDeclaration(IdentifierName("IApplicationBuilder"), Identifier($"Use{middlewareClassName}"))
+                            .WithModifiers(TokenList(new [] {
+                                Token(SyntaxKind.PublicKeyword),
+                                Token(SyntaxKind.StaticKeyword)}))
+                            .WithParameterList(
+                                ParameterList(SingletonSeparatedList(
+                                    Parameter(Identifier("builder"))
+                                        .WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)))
+                                        .WithType(IdentifierName("IApplicationBuilder")))))
+                            .WithBody(Block(SingletonList<StatementSyntax>(
+                                // return builder.UseMiddleware<Middleware1>();
+                                ReturnStatement(
+                                    InvocationExpression(
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("builder"),
+                                            GenericName(Identifier("UseMiddleware"))
+                                                .WithTypeArgumentList(TypeArgumentList(
+                                                    SingletonSeparatedList<TypeSyntax>(IdentifierName(middlewareClassName))))))))))))
+            });
+
+            var newRoot = root.ReplaceNode(compilationUnit, compilationUnit.WithMembers(middlewareClassDeclarations));
+            newRoot = newRoot.ReplaceNode(invocationExpression, registerMiddlewareInvocation);
+
+            return document.WithSyntaxRoot(newRoot);
         }
 
         return document;
