@@ -24,9 +24,9 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
         {
             var compilation = context.Compilation;
 
-            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes) || wellKnownTypes is null)
+            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes, out var failedType) || wellKnownTypes is null)
             {
-                Debug.Fail("One or more types could not be found. This usually means you are bad at spelling C# type names.");
+                Debug.Fail($"{failedType} could not be found.");
                 return;
             }
 
@@ -98,9 +98,7 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        string resourceName = GetResourceNameFromRoutePattern(invocation, out var by);
-
-        // TODO: Add "ByFoo" suffix based on route parameters
+        string resourceName = GetResourceNameFromRoutePattern(verb, invocation, out var by);
 
         var suggestedApiName = verb + resourceName;
 
@@ -137,7 +135,7 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
         };
     }
 
-    private static string GetResourceNameFromRoutePattern(IInvocationOperation invocation, out string? by)
+    private static string GetResourceNameFromRoutePattern(string verb, IInvocationOperation invocation, out string? by)
     {
         var resourceName = "";
         by = null;
@@ -175,6 +173,13 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             if (lastPartWithoutParameter is not null)
             {
                 resourceName = Capitalize(lastPartWithoutParameter);
+
+                // De-pluralize for Create/Update
+                // HACK: Should use something like Humanizer for this
+                if ((verb == "Create" || verb == "Update") && resourceName.EndsWith("s"))
+                {
+                    resourceName = resourceName.Substring(0, resourceName.Length - 1);
+                }
             }
         }
 

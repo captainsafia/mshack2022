@@ -60,6 +60,39 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+  
+    public static readonly DiagnosticDescriptor RecommendUsingRouteGroups = new(
+        "MH008",
+        "Recommend using route groups",
+        "Found several routes that use the same prefix: '{0}'. Consider using a route group to organize these route handlers.",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor EventCallbackCapturingForLoopIteratorVariable = new(
+        "MH009",
+        "An EventCallback is capturing a for loop iteration variable",
+        "The for loop iteration variable '{0}' is being captured in an EventCallback. " +
+        "Consider copying '{0}' into a local variable to avoid this capture.",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ByRefReturnType = new(
+        "MH011",
+        "Found a by-ref return type",
+        "Found a by-ref return type. Return a non-reference type instead. e.g. Span<char> is a by-ref type.",
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ExplicitRouteValue = new(
+        "MH012",
+        "RouteValues is being used explicitly",
+        "RouteValues is being used explicitly. Add a parameter to the method instead. e.g. app.MapGet(\"/{{{0}}}\", (string {0}) => {{}});",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
         "MH013",
