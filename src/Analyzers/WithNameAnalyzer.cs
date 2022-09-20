@@ -98,9 +98,11 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        // Get suggested resource/noun name from route pattern
+        string resourceName = GetResourceNameFromRoutePattern(invocation);
 
-        var suggestedApiName = verb + "TemporaryApiName";
+        // TODO: Add "ByFoo" suffix based on route parameters
+
+        var suggestedApiName = verb + resourceName;
 
         var location = invocation.Syntax.GetLocation();
 
@@ -112,34 +114,6 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             location,
             properties.ToImmutable(),
             suggestedApiName));
-
-        //foreach (var parameter in methodSymbol.Parameters)
-        //{
-        //    var modelBindingAttribute = parameter.GetAttributes(wellKnownTypes.IBinderTypeProviderMetadata).FirstOrDefault() ??
-        //        parameter.GetAttributes(wellKnownTypes.BindAttribute).FirstOrDefault();
-
-        //    if (modelBindingAttribute is not null)
-        //    {
-        //        var location = invocation.Syntax.GetLocation();
-
-        //        context.ReportDiagnostic(Diagnostic.Create(
-        //            DiagnosticDescriptors.WithName,
-        //            location,
-        //            suggestedMethodName));
-        //    }
-        //}
-    }
-
-    private static bool IsRouteHandlerInvocation(
-        WellKnownTypes wellKnownTypes,
-        IInvocationOperation invocation,
-        IMethodSymbol targetMethod)
-    {
-        return targetMethod.Name.StartsWith("Map", StringComparison.Ordinal) &&
-            SymbolEqualityComparer.Default.Equals(wellKnownTypes.EndpointRouteBuilderExtensions, targetMethod.ContainingType) &&
-            invocation.Arguments.Length == 3 &&
-            targetMethod.Parameters.Length == 3 &&
-            SymbolEqualityComparer.Default.Equals(wellKnownTypes.Delegate, targetMethod.Parameters[DelegateParameterOrdinal].Type);
     }
 
     private static string? GetVerbFromMapMethodName(string mapMethodName)
@@ -156,5 +130,48 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             "Delete" => suffix,
             _ => null
         };
+    }
+
+    private static string GetResourceNameFromRoutePattern(IInvocationOperation invocation)
+    {
+        var resourceName = "";
+
+        // Get suggested resource/noun name from route pattern if it's a literal
+        if (invocation.Arguments[1].Syntax is ArgumentSyntax argSyntax
+            && argSyntax.Expression is LiteralExpressionSyntax routePatternLiteral)
+        {
+            // TODO: Do proper route pattern parsing here
+            var routePatternText = routePatternLiteral.Token.ValueText;
+            var parts = routePatternText.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string? lastPartWithoutParameter = null;
+            for (int i = parts.Length - 1; i >= 0; i--)
+            {
+                var part = parts[i];
+                if (part.IndexOf('{') < 0 && part.IndexOf('}') < 0)
+                {
+                    lastPartWithoutParameter = part;
+                    break;
+                }
+            }
+
+            if (lastPartWithoutParameter is not null)
+            {
+                resourceName = Char.ToUpper(lastPartWithoutParameter[0]) + lastPartWithoutParameter.Substring(1);
+            }
+        }
+
+        return resourceName;
+    }
+
+    private static bool IsRouteHandlerInvocation(
+        WellKnownTypes wellKnownTypes,
+        IInvocationOperation invocation,
+        IMethodSymbol targetMethod)
+    {
+        return targetMethod.Name.StartsWith("Map", StringComparison.Ordinal) &&
+            SymbolEqualityComparer.Default.Equals(wellKnownTypes.EndpointRouteBuilderExtensions, targetMethod.ContainingType) &&
+            invocation.Arguments.Length == 3 &&
+            targetMethod.Parameters.Length == 3 &&
+            SymbolEqualityComparer.Default.Equals(wellKnownTypes.Delegate, targetMethod.Parameters[DelegateParameterOrdinal].Type);
     }
 }

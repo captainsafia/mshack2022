@@ -21,6 +21,7 @@ public class WithNameFixer : CodeFixProvider
     {
         foreach (var diagnostic in context.Diagnostics)
         {
+            // TODO: Support multiple suggested names, registering a separate fix for each
             context.RegisterCodeFix(
                 CodeAction.Create($"Add a call to 'WithName(\"{diagnostic.Properties["SuggestedApiName"]}\")'",
                     cancellationToken => AddWithNameInvocation(diagnostic, context.Document, cancellationToken),

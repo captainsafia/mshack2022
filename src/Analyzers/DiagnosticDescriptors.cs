@@ -25,7 +25,7 @@ public static class DiagnosticDescriptors
         "Candidate for WithName CodeFix",
         "Add a call to WithName(\"{0}\")",
         "Usage",
-        DiagnosticSeverity.Info,
+        DiagnosticSeverity.Hidden,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor UseDotnetUserJwtsTool = new(
