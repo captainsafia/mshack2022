@@ -39,6 +39,12 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
+            const string EndpointNameAttribute = "Microsoft.AspNetCore.Routing.EndpointNameAttribute";
+            if (compilation.GetTypeByMetadataName(EndpointNameAttribute) is not { } endpointNameAttribute)
+            {
+                return false;
+            }
+
             wellKnownTypes = new WellKnownTypes
             {
                 EndpointRouteBuilderExtensions = endpointRouteBuilderExtensions,
@@ -46,6 +52,7 @@ namespace MSHack2022.Analyzers
                 IServiceProvider = iServiceProvider,
                 ServiceProviderExtensions = serviceProviderExtensions,
                 JwtBearerExtensions = jwtBearerExtensions,
+                EndpointNameAttribute = endpointNameAttribute
             };
 
             return true;
@@ -56,5 +63,6 @@ namespace MSHack2022.Analyzers
         public INamedTypeSymbol IServiceProvider { get; private set; } = null!;
         public INamedTypeSymbol ServiceProviderExtensions { get; private set; } = null!;
         public INamedTypeSymbol JwtBearerExtensions { get; private set; } = null!;
+        public INamedTypeSymbol EndpointNameAttribute { get; private set; } = null!;
     }
 }

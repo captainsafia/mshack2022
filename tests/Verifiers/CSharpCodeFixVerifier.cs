@@ -34,7 +34,8 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
             // We need to set the output type to an exe to properly
             // support top-level programs in the tests. Otherwise,
             // the test infra will assume we are trying to build a library.
-            TestState = { OutputKind = OutputKind.ConsoleApplication }
+            TestState = { OutputKind = OutputKind.ConsoleApplication },
+            ReferenceAssemblies = CSharpAnalyzerVerifier<TAnalyzer>.GetReferenceAssemblies(),
         };
 
         test.ExpectedDiagnostics.AddRange(expected);

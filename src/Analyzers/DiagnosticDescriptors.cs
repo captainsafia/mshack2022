@@ -20,6 +20,14 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
+    public static readonly DiagnosticDescriptor WithName = new(
+        "MH006",
+        "Candidate for WithName CodeFix",
+        "Add a call to WithName(\"{0}\")",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
+
     public static readonly DiagnosticDescriptor UseDotnetUserJwtsTool = new(
         "MH003",
         "Recommend using dotnet user-jwts tool",
