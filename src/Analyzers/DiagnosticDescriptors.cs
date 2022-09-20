@@ -61,6 +61,7 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
+<<<<<<< HEAD
     public static readonly DiagnosticDescriptor RecommendUsingRouteGroups = new(
         "MH008",
         "Recommend using route groups",
@@ -101,6 +102,10 @@ public static class DiagnosticDescriptors
     
     public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
         "MH014",
+=======
+    public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
+        "MH013",
+>>>>>>> 7701742 (Update descriptor to MH013)
         "Api Method should have health check coverage",
         "Api Method should have health check coverage by an implementation of IHealthCheck",
         "Usage",
