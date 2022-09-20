@@ -77,4 +77,20 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ByRefReturnType = new(
+        "MH011",
+        "Found a by-ref return type",
+        "Found a by-ref return type. Return a non-reference type instead. e.g. Span<char> is a by-ref type.",
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ExplicitRouteValue = new(
+        "MH012",
+        "RouteValues is being used explicitly",
+        "RouteValues is being used explicitly. Add a parameter to the method instead. e.g. app.MapGet(\"/{{{0}}}\", (string {0}) => {{}});",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
 }
