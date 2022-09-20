@@ -62,7 +62,7 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
-        "MH008",
+        "MH013",
         "Api Method should have health check coverage",
         "Api Method should have health check coverage by an implementation of IHealthCheck",
         "Usage",
