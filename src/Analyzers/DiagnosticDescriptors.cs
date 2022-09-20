@@ -9,7 +9,7 @@ public static class DiagnosticDescriptors
         "Found the meaning of life",
         "Found a variable assigned to 42. Consider using the 'meaningOfLife' identifier.",
         "Usage",
-        DiagnosticSeverity.Info,
+        DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ComponentsShouldNotWriteToTheirOwnParameters = new(
@@ -57,6 +57,14 @@ public static class DiagnosticDescriptors
         "JavaScript interop should not be performed within 'OnInitializedAsync()'",
         "The 'OnInitializedAsync()' method may get called during prerendering, when JavaScript " +
         "interop is not available. Please move this call to 'OnAfterRenderAsync(bool firstRender)'.",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
+        "MH008",
+        "Api Method should have health check coverage",
+        "Api Method should have health check coverage by an implementation of IHealthCheck",
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
