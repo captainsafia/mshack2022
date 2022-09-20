@@ -49,7 +49,7 @@ public static class DiagnosticDescriptors
         "Found an invalid modifier on an argument",
         "Found an argument with an invalid modifier like 'out', 'ref', or 'in'. Remove the modifier.",
         "Usage",
-        DiagnosticSeverity.Warning,
+        DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ShouldNotPerformJsInteropInOnInitializedAsync = new(

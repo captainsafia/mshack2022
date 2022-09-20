@@ -2,8 +2,9 @@ using Microsoft.CodeAnalysis.Testing;
 using MSHack2022.Analyzers;
 using System.Threading.Tasks;
 using Xunit;
-using VerifyCS = MSHack2022.Tests.CSharpAnalyzerVerifier<
-    MSHack2022.Analyzers.ParamalyzerAnalyzer>;
+using VerifyCS = MSHack2022.Tests.CSharpCodeFixVerifier<
+    MSHack2022.Analyzers.ParamalyzerAnalyzer,
+    MSHack2022.Codefixers.ParamFixer>;
 
 namespace MSHack2022.Tests;
 
@@ -382,5 +383,139 @@ class Program
 }
 ", new DiagnosticResult(DiagnosticDescriptors.ExplicitRouteValue).WithLocation(0)
         .WithArguments("name"));
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnOutParameter()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (out string {|MH005:s|}) => { s = string.Empty; });
+
+app.Run();
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (string s) => { s = string.Empty; });
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnInParameter()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (in string {|MH005:s|}) => { });
+
+app.Run();
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (string s) => { });
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnRefParameter()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (ref string {|MH005:s|}) => { });
+
+app.Run();
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (string s) => { });
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnMultipleParameters()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (ref string {|MH005:s|}, in object {|MH005:o|}) => { });
+
+app.Run();
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", (string s, object o) => { });
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnMethod()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", Func);
+
+app.Run();
+
+static void Func(ref string {|MH005:s|}) { }
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapGet(""/"", Func);
+
+app.Run();
+
+static void Func(string s) { }
+");
     }
 }
