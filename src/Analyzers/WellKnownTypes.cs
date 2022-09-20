@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace MSHack2022.Analyzers
@@ -53,6 +54,12 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
+            const string HttpMethodAttribute = "Microsoft.AspNetCore.Mvc.Routing.HttpMethodAttribute";
+            if (compilation.GetTypeByMetadataName(HttpMethodAttribute) is not { } httpMethodAttribute)
+            {
+                return false;
+            }
+
             wellKnownTypes = new WellKnownTypes
             {
                 EndpointRouteBuilderExtensions = endpointRouteBuilderExtensions,
@@ -60,7 +67,8 @@ namespace MSHack2022.Analyzers
                 IServiceProvider = iServiceProvider,
                 ServiceProviderExtensions = serviceProviderExtensions,
                 JwtBearerExtensions = jwtBearerExtensions,
-                EndpointNameAttribute = endpointNameAttribute
+                EndpointNameAttribute = endpointNameAttribute,
+                HttpMethodAttribute = httpMethodAttribute
             };
 
             failedType = null;
@@ -73,5 +81,6 @@ namespace MSHack2022.Analyzers
         public INamedTypeSymbol ServiceProviderExtensions { get; private set; } = null!;
         public INamedTypeSymbol JwtBearerExtensions { get; private set; } = null!;
         public INamedTypeSymbol EndpointNameAttribute { get; private set; } = null!;
+        public INamedTypeSymbol HttpMethodAttribute { get; private set; } = null!;
     }
 }
