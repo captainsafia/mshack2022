@@ -78,6 +78,14 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
+    public static readonly DiagnosticDescriptor MoveMiddlewareToClass = new(
+        "MH010",
+        "Candidate for MoveMiddlewareToClass CodeFix",
+        "Move inline middleware to its own class",
+        "Usage",
+        DiagnosticSeverity.Hidden,
+        isEnabledByDefault: true);
+
     public static readonly DiagnosticDescriptor ByRefReturnType = new(
         "MH011",
         "Found a by-ref return type",

@@ -56,7 +56,6 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             {
                 var lambda = (IAnonymousFunctionOperation)delegateCreation.Target;
                 SuggestApiName(in context, targetMethod, wellKnownTypes, invocation, lambda.Symbol);
-
             }
         }, OperationKind.Invocation);
     }

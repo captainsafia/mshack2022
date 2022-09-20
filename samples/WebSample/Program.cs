@@ -21,4 +21,11 @@ app.MapGet("/mh/005", (ref string s) =>
     return "Hello world!";
 });
 
+app.Use((context, next) => {
+    var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger("LogTraceIdentifierMiddleware");
+    logger.LogInformation("Middleware ran on request {requestId}", context.TraceIdentifier);
+    return next(context);
+});
+
 app.Run();

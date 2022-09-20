@@ -11,10 +11,17 @@ namespace MSHack2022.Analyzers
             [NotNullWhen(false)] out string? failedType)
         {
             wellKnownTypes = default;
+
             const string EndpointRouteBuilderExtensions = "Microsoft.AspNetCore.Builder.EndpointRouteBuilderExtensions";
             if (compilation.GetTypeByMetadataName(EndpointRouteBuilderExtensions) is not { } endpointRouteBuilderExtensions)
             {
                 failedType = EndpointRouteBuilderExtensions;
+                return false;
+            }
+
+            const string UseExtensions = "Microsoft.AspNetCore.Builder.UseExtensions";
+            if (compilation.GetTypeByMetadataName(UseExtensions) is not { } useExtensions)
+            {
                 return false;
             }
 
@@ -25,10 +32,40 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
+            const string Task = "System.Threading.Tasks.Task";
+            if (compilation.GetTypeByMetadataName(Task) is not { } task)
+            {
+                return false;
+            }
+
+            const string TaskTResult = "System.Threading.Tasks.Task`1";
+            if (compilation.GetTypeByMetadataName(TaskTResult) is not { } taskTResult)
+            {
+                return false;
+            }
+
+            const string FuncOfT1T2TResult = "System.Func`3";
+            if (compilation.GetTypeByMetadataName(FuncOfT1T2TResult) is not { } funcOfT1T2TResult)
+            {
+                return false;
+            }
+
+            const string RequestDelegate = "Microsoft.AspNetCore.Http.RequestDelegate";
+            if (compilation.GetTypeByMetadataName(RequestDelegate) is not { } requestDelegate)
+            {
+                return false;
+            }
+
             const string IServiceProvider = "System.IServiceProvider";
             if (compilation.GetTypeByMetadataName(IServiceProvider) is not { } iServiceProvider)
             {
                 failedType = IServiceProvider;
+                return false;
+            }
+
+            const string HttpContext = "Microsoft.AspNetCore.Http.HttpContext";
+            if (compilation.GetTypeByMetadataName(HttpContext) is not { } httpContext)
+            {
                 return false;
             }
 
@@ -53,10 +90,20 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
+            // Construct generic type symbols
+            var funcOfHttpContextRequestDelegateTask = funcOfT1T2TResult.Construct(httpContext, requestDelegate, task);
+
             wellKnownTypes = new WellKnownTypes
             {
                 EndpointRouteBuilderExtensions = endpointRouteBuilderExtensions,
+                UseExtensions = useExtensions,
                 Delegate = @delegate,
+                RequestDelegate = requestDelegate,
+                HttpContext = httpContext,
+                Task = task,
+                TaskTResult = taskTResult,
+                FuncOfT1T2TResult = funcOfT1T2TResult,
+                Func_HttpContext_RequestDelegate_Task = funcOfHttpContextRequestDelegateTask,
                 IServiceProvider = iServiceProvider,
                 ServiceProviderExtensions = serviceProviderExtensions,
                 JwtBearerExtensions = jwtBearerExtensions,
@@ -68,7 +115,14 @@ namespace MSHack2022.Analyzers
         }
 
         public INamedTypeSymbol EndpointRouteBuilderExtensions { get; private set; } = null!;
+        public INamedTypeSymbol UseExtensions { get; private set; } = null!;
         public INamedTypeSymbol Delegate { get; private set; } = null!;
+        public INamedTypeSymbol RequestDelegate { get; private set; } = null!;
+        public INamedTypeSymbol HttpContext { get; private set; } = null!;
+        public INamedTypeSymbol Task { get; private set; } = null!;
+        public INamedTypeSymbol TaskTResult { get; private set; } = null!;
+        public INamedTypeSymbol FuncOfT1T2TResult { get; private set; } = null!;
+        public INamedTypeSymbol Func_HttpContext_RequestDelegate_Task { get; private set; } = null!;
         public INamedTypeSymbol IServiceProvider { get; private set; } = null!;
         public INamedTypeSymbol ServiceProviderExtensions { get; private set; } = null!;
         public INamedTypeSymbol JwtBearerExtensions { get; private set; } = null!;
