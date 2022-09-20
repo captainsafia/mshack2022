@@ -211,6 +211,29 @@ class Program
         await VerifyCS.VerifyAnalyzerAsync(@"
 using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+        app.MapGet(""/get"", (string s) => 
+        {
+            return ""Hello world!"";
+        });
+    }
+}
+");
+    }
+
+    [Fact]
+    public async Task TriggersOnByRefReturnFromLambda()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
 
 class Program
 {
@@ -219,12 +242,145 @@ class Program
         var builder = WebApplication.CreateBuilder();
         var app = builder.Build();
 
-        app.MapGet(""/get"", (string s) => 
+        app.MapGet(""/get"", () =>
         {
-            return ""Hello world!"";
+            {|#0:return ""Hello world!"".AsSpan();|}
         });
     }
 }
-");
+", new DiagnosticResult(DiagnosticDescriptors.ByRefReturnType).WithLocation(0));
+    }
+
+    [Fact]
+    public async Task TriggersOnByRefReturnFromMethod()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", {|#0:Func|});
+    }
+
+    static ReadOnlySpan<char> Func()
+    {
+        return ""Hello world!"".AsSpan();
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.ByRefReturnType).WithLocation(0));
+    }
+
+    [Fact]
+    public async Task TriggersOnAllByRefReturnLocationsFromLambda()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", () =>
+        {
+            if (true)
+            {
+                {|#0:return ""Hello"".AsSpan();|}
+            }
+            {|#1:return ""Hello world!"".AsSpan();|}
+        });
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.ByRefReturnType).WithLocation(0),
+   new DiagnosticResult(DiagnosticDescriptors.ByRefReturnType).WithLocation(1));
+    }
+
+    [Fact]
+    public async Task TriggersOnlyOnByRefReturnLocationFromLambda()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", () =>
+        {
+            if (true)
+            {
+                // implicit conversion, user code is fine so don't create diagnostic
+                return ""Hello"";
+            }
+            {|#0:return ""Hello world!"".AsSpan();|}
+        });
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.ByRefReturnType).WithLocation(0));
+    }
+
+    [Fact]
+    public async Task TriggersOnRouteValuesUsageInLambda()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", (HttpRequest req) =>
+        {
+            return $""{req.{|#0:RouteValues|}[""name""]}"";
+        });
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.ExplicitRouteValue).WithLocation(0)
+        .WithArguments("name"));
+    }
+
+    [Fact]
+    public async Task TriggersOnRouteValuesUsageInMethod()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+
+class Program
+{
+    static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        app.MapGet(""/get"", {|#0:Func|});
+    }
+
+    static string Func(HttpRequest req)
+    {
+        return $""{req.RouteValues[""name""]}"";
+    }
+}
+", new DiagnosticResult(DiagnosticDescriptors.ExplicitRouteValue).WithLocation(0)
+        .WithArguments("name"));
     }
 }
