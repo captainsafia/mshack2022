@@ -22,6 +22,7 @@ namespace MSHack2022.Analyzers
             const string UseExtensions = "Microsoft.AspNetCore.Builder.UseExtensions";
             if (compilation.GetTypeByMetadataName(UseExtensions) is not { } useExtensions)
             {
+                failedType = UseExtensions;
                 return false;
             }
 
@@ -35,24 +36,28 @@ namespace MSHack2022.Analyzers
             const string Task = "System.Threading.Tasks.Task";
             if (compilation.GetTypeByMetadataName(Task) is not { } task)
             {
+                failedType = Task;
                 return false;
             }
 
             const string TaskTResult = "System.Threading.Tasks.Task`1";
             if (compilation.GetTypeByMetadataName(TaskTResult) is not { } taskTResult)
             {
+                failedType = TaskTResult;
                 return false;
             }
 
             const string FuncOfT1T2TResult = "System.Func`3";
             if (compilation.GetTypeByMetadataName(FuncOfT1T2TResult) is not { } funcOfT1T2TResult)
             {
+                failedType = FuncOfT1T2TResult;
                 return false;
             }
 
             const string RequestDelegate = "Microsoft.AspNetCore.Http.RequestDelegate";
             if (compilation.GetTypeByMetadataName(RequestDelegate) is not { } requestDelegate)
             {
+                failedType = RequestDelegate;
                 return false;
             }
 
@@ -66,6 +71,7 @@ namespace MSHack2022.Analyzers
             const string HttpContext = "Microsoft.AspNetCore.Http.HttpContext";
             if (compilation.GetTypeByMetadataName(HttpContext) is not { } httpContext)
             {
+                failedType = HttpContext;
                 return false;
             }
 
