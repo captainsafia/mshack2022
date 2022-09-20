@@ -21,7 +21,7 @@ class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        [|builder.Services.AddAuthentication().AddJwtBearer()|];
+        {|MH003:builder.Services.AddAuthentication().AddJwtBearer()|};
 
         var app = builder.Build();
 
@@ -41,7 +41,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-[|builder.Services.AddAuthentication().AddJwtBearer()|];
+{|MH003:builder.Services.AddAuthentication().AddJwtBearer()|};
 
 var app = builder.Build();
 
@@ -131,10 +131,157 @@ public static class TestExtensionMethods
 {
     public static IServiceCollection AddJwtBearer(this IServiceCollection services)
     {
-        [|services.AddAuthentication().AddJwtBearer()|];
+        {|MH003:services.AddAuthentication().AddJwtBearer()|};
         return services;
     }
 }
+");
+    }
+
+    [Fact]
+    public async Task TriggersOnRoutesWithSamePrefix()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using Microsoft.AspNetCore.Builder;
+
+public static class Program
+{
+    static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        var app = builder.Build();
+
+        {|MH008:app.MapGet(""/mh/001"", () => 
+        {
+            int i = 42;
+            return ""Hello world!"";
+        })|};
+
+        {|MH008:app.MapGet(""/mh/002"", () =>
+        {
+            int i = 42;
+            return ""Hello world!"";
+        })|};
+
+        app.Run();
+    }
+}
+");
+    }
+
+    [Fact]
+    public async Task TriggersOnRoutesWithSamePrefix_TopLevelStatements()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using Microsoft.AspNetCore.Builder;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+{|MH008:app.MapGet(""/mh/001"", () => 
+{
+    int i = 42;
+    return ""Hello world!"";
+})|};
+
+{|MH008:app.MapGet(""/mh/002"", () =>
+{
+    int i = 42;
+    return ""Hello world!"";
+})|};
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task TriggersOnRoutesWithSamePrefix_DifferentMethods()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using Microsoft.AspNetCore.Builder;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+{|MH008:app.MapGet(""/mh/001"", () => 
+{
+    return ""Hello world!"";
+})|};
+
+{|MH008:app.MapPost(""/mh/002"", () =>
+{
+    return ""Hello world!"";
+})|};
+
+{|MH008:app.MapDelete(""/mh/003"", () =>
+{
+    return ""Hello world!"";
+})|};
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task TriggersOnRoutesWithMultipleSamePrefixes()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using Microsoft.AspNetCore.Builder;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+{|MH008:app.MapGet(""/mh/001"", () => 
+{
+    return ""Hello world!"";
+})|};
+
+{|MH008:app.MapPost(""/mh/002"", () =>
+{
+    return ""Hello world!"";
+})|};
+
+{|MH008:app.MapDelete(""/ah/003"", () =>
+{
+    return ""Hello world!"";
+})|};
+
+{|MH008:app.MapGet(""/ah/003"", () =>
+{
+    return ""Hello world!"";
+})|};
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task DoesNotTriggerOnDifferentRoutePrefixes()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using Microsoft.AspNetCore.Builder;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+app.MapGet(""/mh/001"", () => 
+{
+    int i = 42;
+    return ""Hello world!"";
+});
+
+app.MapGet(""/ah/002"", () =>
+{
+    int i = 42;
+    return ""Hello world!"";
+});
+
+app.Run();
 ");
     }
 }
