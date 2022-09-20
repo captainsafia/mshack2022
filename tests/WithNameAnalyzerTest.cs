@@ -30,6 +30,74 @@ record Todo(int Id, string Title, bool IsComplete);
     }
 
     [Fact]
+    public async Task AnalyzerTriggersOnMapPostWithNoParameters()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+[|app.MapPost(""/todos"", () => {})|];
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnMapPostWithNoParameters()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+[|app.MapPost(""/todos"", () => {})|];
+
+app.Run();
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapPost(""/todos"", () => {}).WithName(""CreateTodo"");
+
+app.Run();
+");
+    }
+
+    [Fact]
+    public async Task CodefixTriggersOnMapPutWithNoParameters()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+[|app.MapPut(""/todos"", () => {})|];
+
+app.Run();
+", @"
+using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+app.MapPut(""/todos"", () => {}).WithName(""UpdateTodo"");
+
+app.Run();
+");
+    }
+
+    [Fact]
     public async Task AnalyzerDoesNotTriggerOnMapGetAlreadyCallingWithName()
     {
         await VerifyCS.VerifyAnalyzerAsync(@"
