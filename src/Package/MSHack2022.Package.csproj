@@ -1,42 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
 
-	<PropertyGroup>
-		<PackageId>Hackalyzers</PackageId>
-		<PackageVersion>0.0.2</PackageVersion>
-		<Authors>MSHack2022 Team</Authors>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<Description>Analyzers and codefixers prototyped during MSHack2022.</Description>
-		<Copyright>Copyright</Copyright>
-		<PackageTags>codefixers, analyzers, aspnet</PackageTags>
-		<DevelopmentDependency>true</DevelopmentDependency>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
+  <PropertyGroup>
+    <PackageId>Hackalyzers</PackageId>
+    <PackageVersion>0.0.2</PackageVersion>
+    <Authors>MSHack2022 Team</Authors>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Analyzers and codefixers prototyped during MSHack2022.</Description>
+    <Copyright>Copyright</Copyright>
+    <PackageTags>codefixers, analyzers, aspnet</PackageTags>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
 
-		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
-	</PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4-beta1.22403.2" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4-beta1.22403.2" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Analyzers\MSHack2022.Analyzers.csproj" />
-		<ProjectReference Include="..\Codefixers\MSHack2022.Codefixers.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzers\MSHack2022.Analyzers.csproj" />
+    <ProjectReference Include="..\Codefixers\MSHack2022.Codefixers.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+  </ItemGroup>
 
-	<Target Name="_AddAnalyzersToOutput">
-		<ItemGroup>
-			<TfmSpecificPackageFile Include="$(OutputPath)\MSHack2022.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-			<TfmSpecificPackageFile Include="$(OutputPath)\MSHack2022.Codefixers.dll" PackagePath="analyzers/dotnet/cs" />
-		</ItemGroup>
-	</Target>
+  <Target Name="_AddAnalyzersToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)\MSHack2022.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\MSHack2022.Codefixers.dll" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
 </Project>
