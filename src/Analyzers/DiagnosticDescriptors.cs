@@ -61,6 +61,14 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
+    public static readonly DiagnosticDescriptor RecommendUsingRouteGroups = new(
+        "MH008",
+        "Recommend using route groups",
+        "Found several routes that use the same prefix: '{0}'. Consider using a route group to organize these route handlers.",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
+
     public static readonly DiagnosticDescriptor EventCallbackCapturingForLoopIteratorVariable = new(
         "MH009",
         "An EventCallback is capturing a for loop iteration variable",
