@@ -26,9 +26,9 @@ public partial class GetServiceAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(static context =>
         {
             var compilation = context.Compilation;
-            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes))
+            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes, out var failedType))
             {
-                Debug.Fail("One or more types could not be found. This usually means you are bad at spelling C# type names.");
+                Debug.Fail($"{failedType} could not be found.");
                 return;
             }
 

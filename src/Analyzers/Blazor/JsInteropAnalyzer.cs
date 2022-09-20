@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace MSHack2022.Analyzers.Blazor;
 
@@ -19,8 +20,9 @@ public class JsInteropAnalyzer : DiagnosticAnalyzer
         {
             var compilation = compilationStartAnalysisContext.Compilation;
 
-            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes))
+            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes, out var failedType))
             {
+                Debug.Fail($"{failedType} could not be found.");
                 return;
             }
 
