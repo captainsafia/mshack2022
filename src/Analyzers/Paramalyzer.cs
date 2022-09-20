@@ -23,9 +23,9 @@ public partial class ParamalyzerAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(context =>
         {
             var compilation = context.Compilation;
-            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes))
+            if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes, out var failedType))
             {
-                Debug.Fail("One or more types could not be found.");
+                Debug.Fail($"{failedType} could not be found.");
                 return;
             }
 
