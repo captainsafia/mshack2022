@@ -1,7 +1,9 @@
-﻿@page "/"
+﻿@page "/{message?}"
 @inject IJSRuntime JS
 
 <h1>Hello, world!</h1>
+
+@Message<br />
 
 @for (var i = 0; i < 10; i++)
 {
@@ -10,7 +12,13 @@
 
     @*Should not report a diagnostic:*@
     var index = i;
-    <button @onclick="@(() => JS.InvokeVoidAsync("window.alert", index))">@i</button>
+    <button @onclick="@(() => JS.InvokeVoidAsync("alert", index))">@i</button>
 }
 
 <Counter />
+
+@code{
+    [Parameter] // Removing this line should report a diagnostic.
+    [SupplyParameterFromQuery]
+    public string? Message { get; set; }
+}
