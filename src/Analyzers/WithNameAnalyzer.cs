@@ -98,11 +98,16 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        string resourceName = GetResourceNameFromRoutePattern(invocation);
+        string resourceName = GetResourceNameFromRoutePattern(invocation, out var by);
 
         // TODO: Add "ByFoo" suffix based on route parameters
 
         var suggestedApiName = verb + resourceName;
+
+        if (by is not null)
+        {
+            suggestedApiName += "By" + Capitalize(by);
+        }
 
         var location = invocation.Syntax.GetLocation();
 
@@ -132,9 +137,10 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
         };
     }
 
-    private static string GetResourceNameFromRoutePattern(IInvocationOperation invocation)
+    private static string GetResourceNameFromRoutePattern(IInvocationOperation invocation, out string? by)
     {
         var resourceName = "";
+        by = null;
 
         // Get suggested resource/noun name from route pattern if it's a literal
         if (invocation.Arguments[1].Syntax is ArgumentSyntax argSyntax
@@ -143,24 +149,50 @@ public partial class WithNameAnalyzer : DiagnosticAnalyzer
             // TODO: Do proper route pattern parsing here
             var routePatternText = routePatternLiteral.Token.ValueText;
             var parts = routePatternText.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
             string? lastPartWithoutParameter = null;
+            var parameters = new List<string>();
+
             for (int i = parts.Length - 1; i >= 0; i--)
             {
                 var part = parts[i];
-                if (part.IndexOf('{') < 0 && part.IndexOf('}') < 0)
+
+                if (!(part.StartsWith("{") && part.EndsWith("}")))
                 {
-                    lastPartWithoutParameter = part;
-                    break;
+                    lastPartWithoutParameter ??= part;
                 }
+                else
+                {
+                    parameters.Add(part.Substring(1, part.Length - 2));
+                }
+            }
+
+            if (parameters.Count > 0)
+            {
+                by = parameters[parameters.Count - 1];
             }
 
             if (lastPartWithoutParameter is not null)
             {
-                resourceName = Char.ToUpper(lastPartWithoutParameter[0]) + lastPartWithoutParameter.Substring(1);
+                resourceName = Capitalize(lastPartWithoutParameter);
             }
         }
 
         return resourceName;
+    }
+
+    private static string Capitalize(string word)
+    {
+        if (word.Length > 1)
+        {
+            return Char.ToUpper(word[0]) + word.Substring(1);
+        }
+        else if (word.Length == 1)
+        {
+            return Char.ToUpper(word[0]).ToString();
+        }
+
+        return word;
     }
 
     private static bool IsRouteHandlerInvocation(

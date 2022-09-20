@@ -143,4 +143,40 @@ app.Run();
 record Todo(int Id, string Title, bool IsComplete);
 ");
     }
+
+    [Fact]
+    public async Task CodeFixOnMapGet_SuggestsNameUsing_VerbAndRoutePatternWithParameter()
+    {
+        await VerifyCS.VerifyCodeFixAsync(@"
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+var todos = new List<Todo> { new(1, ""Do the laundry"", false) };
+
+[|app.MapGet(""/todos/{id}"", () => todos)|];
+
+app.Run();
+
+record Todo(int Id, string Title, bool IsComplete);
+", @"
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+
+var app = WebApplication.Create();
+
+var todos = new List<Todo> { new(1, ""Do the laundry"", false) };
+
+app.MapGet(""/todos/{id}"", () => todos).WithName(""GetTodosById"");
+
+app.Run();
+
+record Todo(int Id, string Title, bool IsComplete);
+");
+    }
 }
