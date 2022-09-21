@@ -97,7 +97,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor MissingParameterAttribute = new(
         "MH013",
         "Missing 'ParameterAttribute' attribute",
-        "The 'ParameterAttribute' attribute is required for properties annotated with the '{0}' attribute",
+        "Properties annotated with the '{0}' attribute must also have either a '[Parameter]' attribute or a '[CascadingParameter]' attribute",
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
