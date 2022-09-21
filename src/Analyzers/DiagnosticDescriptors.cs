@@ -9,7 +9,7 @@ public static class DiagnosticDescriptors
         "Found the meaning of life",
         "Found a variable assigned to 42. Consider using the 'meaningOfLife' identifier.",
         "Usage",
-        DiagnosticSeverity.Info,
+        DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ComponentsShouldNotWriteToTheirOwnParameters = new(
@@ -18,14 +18,6 @@ public static class DiagnosticDescriptors
         "The parameter '{0}' is being written to from its defining component",
         "Usage",
         DiagnosticSeverity.Warning,
-        isEnabledByDefault: true);
-
-    public static readonly DiagnosticDescriptor WithName = new(
-        "MH006",
-        "Candidate for WithName CodeFix",
-        "Add a call to WithName(\"{0}\")",
-        "Usage",
-        DiagnosticSeverity.Hidden,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor UseDotnetUserJwtsTool = new(
@@ -50,6 +42,14 @@ public static class DiagnosticDescriptors
         "Found an argument with an invalid modifier like 'out', 'ref', or 'in'. Remove the modifier.",
         "Usage",
         DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor WithName = new(
+        "MH006",
+        "Candidate for WithName CodeFix",
+        "Add a call to WithName(\"{0}\")",
+        "Usage",
+        DiagnosticSeverity.Hidden,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ShouldNotPerformJsInteropInOnInitializedAsync = new(
@@ -98,6 +98,11 @@ public static class DiagnosticDescriptors
         "MH013",
         "Missing 'ParameterAttribute' attribute",
         "Properties annotated with the '{0}' attribute must also have either a '[Parameter]' attribute or a '[CascadingParameter]' attribute",
+    
+    public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
+        "MH014",
+        "Api Method should have health check coverage",
+        "Api Method should have health check coverage by an implementation of IHealthCheck",
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
