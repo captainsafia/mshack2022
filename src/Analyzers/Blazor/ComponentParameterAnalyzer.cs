@@ -27,6 +27,11 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
+            var attributesQualifyingAsParameterAttributes = ImmutableHashSet.Create(
+                SymbolEqualityComparer.Default,
+                wellKnownTypes.ParameterAttribute,
+                wellKnownTypes.CascadingParameterAttribute);
+
             var attributesRequiringParameterAttribute = ImmutableHashSet.Create(
                 SymbolEqualityComparer.Default,
                 wellKnownTypes.SupplyParameterFromQueryAttribute,
@@ -56,22 +61,26 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
 
             compilationStartAnalysisContext.RegisterSymbolAction(symbolAnalysisContext =>
             {
-                if (symbolAnalysisContext.Symbol is IPropertySymbol propertySymbol &&
-                    !propertySymbol.HasAttribute(wellKnownTypes.ParameterAttribute))
+                if (symbolAnalysisContext.Symbol is IPropertySymbol propertySymbol)
                 {
-                    foreach (var attribute in propertySymbol.GetAttributes())
-                    {
-                        if (attribute.AttributeClass is { } attributeClass &&
-                            attributesRequiringParameterAttribute.Contains(attributeClass))
-                        {
-                            var cancellationToken = symbolAnalysisContext.CancellationToken;
-                            var attributeLocation = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken)?.GetLocation();
-                            var location = attributeLocation ?? propertySymbol.Locations.FirstOrDefault();
+                    var attributes = propertySymbol.GetAttributes();
+                    var hasParameterAttribute = attributes.Any(a => attributesQualifyingAsParameterAttributes.Contains(a.AttributeClass));
 
-                            symbolAnalysisContext.ReportDiagnostic(Diagnostic.Create(
-                                DiagnosticDescriptors.MissingParameterAttribute,
-                                location,
-                                attributeClass.Name));
+                    if (!hasParameterAttribute)
+                    {
+                        foreach (var attribute in attributes)
+                        {
+                            if (attributesRequiringParameterAttribute.Contains(attribute.AttributeClass))
+                            {
+                                var cancellationToken = symbolAnalysisContext.CancellationToken;
+                                var attributeLocation = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken)?.GetLocation();
+                                var location = attributeLocation ?? propertySymbol.Locations.FirstOrDefault();
+
+                                symbolAnalysisContext.ReportDiagnostic(Diagnostic.Create(
+                                    DiagnosticDescriptors.MissingParameterAttribute,
+                                    location,
+                                    attribute.AttributeClass!.Name));
+                            }
                         }
                     }
                 }

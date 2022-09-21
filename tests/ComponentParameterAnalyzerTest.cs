@@ -298,4 +298,21 @@ class MyComponent : ComponentBase
 }}
 ");
     }
+
+    [Fact]
+    public async Task MissingAttributeDiagnostic_DoesNotTriggerWhenCascadingParameterAttributeIsPresent()
+    {
+        await VerifyCS.VerifyAnalyzerAsync($@"
+using Microsoft.AspNetCore.Components;
+
+{ProgramMain}
+
+class MyComponent : ComponentBase
+{{
+    [CascadingParameter]
+    [SupplyParameterFromQuery]
+    public int Foo {{ get; set; }}
+}}
+");
+    }
 }
