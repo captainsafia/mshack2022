@@ -89,6 +89,7 @@ public partial class MinimalNet7Analyzers : DiagnosticAnalyzer
                 var invocationTarget = invocation.TargetMethod;
                 if (invocationTarget is not null
                     && invocationTarget.Name == "AddJwtBearer"
+                    && wellKnownTypes.JwtBearerExtensions is not null
                     && SymbolEqualityComparer.Default.Equals(wellKnownTypes!.JwtBearerExtensions, invocationTarget.ContainingType))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.UseDotnetUserJwtsTool, invocation.Syntax.GetLocation()));
