@@ -21,6 +21,8 @@ app.MapGet("/mh/005", (ref string s) =>
     return "Hello world!";
 });
 
+app.Use((context, next) => next(context));
+
 app.Use((context, next) => {
     var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
     var logger = loggerFactory.CreateLogger("LogTraceIdentifierMiddleware");

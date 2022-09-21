@@ -36,12 +36,15 @@ using Microsoft.AspNetCore.Builder;
 
 var app = WebApplication.Create();
 
-[|app.Use((context, next) => next(context))|];
+[|app.Use((context, next) =>
+{
+    var foo = 123;
+    return next(context);
+})|];
 
 app.Run();
 ", @"
 using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
@@ -61,8 +64,9 @@ internal class Middleware1
         _next = next;
     }
 
-    public Task InvokeAsync(HttpContext context)
+    public System.Threading.Tasks.Task InvokeAsync(HttpContext context)
     {
+        var foo = 123;
         return _next(context);
     }
 }
@@ -73,7 +77,6 @@ internal static class Middleware1Extensions
     {
         return builder.UseMiddleware<Middleware1>();
     }
-}
-");
+}");
     }
 }

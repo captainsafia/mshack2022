@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Tags;
+using Microsoft.CodeAnalysis.Editing;
 using MSHack2022.Analyzers;
 using System.Collections.Immutable;
 using System.Composition;
@@ -36,37 +36,45 @@ public class MoveMiddlewareToClassFixer : CodeFixProvider
     private static async Task<Document> MoveToMiddlewareClass(Diagnostic diagnostic, Document document, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+        var semanticModel = await document.GetSemanticModelAsync().ConfigureAwait(false);
 
-        if (root is null)
+        if (root is not CompilationUnitSyntax compilationUnit || semanticModel is null)
         {
             return document;
         }
+
+        var generator = SyntaxGenerator.GetGenerator(document);
 
         var diagnosticTarget = root.FindNode(diagnostic.Location.SourceSpan);
         
         if (diagnosticTarget is InvocationExpressionSyntax invocationExpression)
         {
-            var compilationUnit = diagnosticTarget.FirstAncestorOrSelf<CompilationUnitSyntax>();
-
-            if (compilationUnit is null)
-            {
-                return document;
-            }
-
             // TODO: Check for name collisions
             var middlewareClassName = "Middleware1";
-
+            
             // app.UseMiddleware1();
-            var registerMiddlewareInvocation = ExpressionStatement(
-                InvocationExpression(
-                    MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName("app"),
-                        IdentifierName($"Use{middlewareClassName}"))));
+            var registerMiddlewareInvocation = InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("app"),
+                    IdentifierName($"Use{middlewareClassName}")));
 
             // TODO: Support hoisting closures to middleware constructor arguments
 
-            var middlewareClassDeclarations =  List(new MemberDeclarationSyntax[] {
+            var middlwareStatements = invocationExpression
+                    .DescendantNodes().OfType<ParenthesizedLambdaExpressionSyntax>().First()
+                    .DescendantNodes().OfType<BlockSyntax>().First().ChildNodes();
+
+            var httpContextSymbol = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Http.HttpContext")!;
+            var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task")!;
+            var invokeMethod = generator.MethodDeclaration("Invoke",
+                new[] { generator.ParameterDeclaration("context", generator.TypeExpression(httpContextSymbol)) },
+                null,
+                generator.TypeExpression(taskSymbol),
+                Accessibility.Public,
+                statements: middlwareStatements);
+
+            var middlewareClassDeclarations = new MemberDeclarationSyntax[] {
                 // internal class Middleware1
                 ClassDeclaration(middlewareClassName)
                     .WithModifiers(TokenList(Token(SyntaxKind.InternalKeyword)))
@@ -88,15 +96,17 @@ public class MoveMiddlewareToClassFixer : CodeFixProvider
                                         IdentifierName("_next"),
                                         IdentifierName("next")))))),
                         // public Task InvokeAsync(HttpContext context)
-                        MethodDeclaration(IdentifierName("Task"), Identifier("InvokeAsync"))
-                            .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                            .WithParameterList(ParameterList(SingletonSeparatedList(
-                                Parameter(Identifier("context")).WithType(IdentifierName("HttpContext")))))
-                            .WithBody(Block(SingletonList<StatementSyntax>(
-                                ReturnStatement(
-                                    InvocationExpression(IdentifierName("_next"))
-                                        .WithArgumentList(ArgumentList(SingletonSeparatedList(
-                                            Argument(IdentifierName("context")))))))))})),
+                        //MethodDeclaration(IdentifierName("Task"), Identifier("InvokeAsync"))
+                        //    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                        //    .WithParameterList(ParameterList(SingletonSeparatedList(
+                        //        Parameter(Identifier("context")).WithType(IdentifierName("HttpContext")))))
+                        //    .WithBody(Block(SingletonList<StatementSyntax>(
+                        //        ReturnStatement(
+                        //            InvocationExpression(IdentifierName("_next"))
+                        //                .WithArgumentList(ArgumentList(SingletonSeparatedList(
+                        //                    Argument(IdentifierName("context")))))))))
+                        (MemberDeclarationSyntax)invokeMethod
+                    })),
                 // internal static class Middleware1Extensions
                 ClassDeclaration($"{middlewareClassName}Extensions")
                     .WithModifiers(TokenList(new [] {
@@ -123,10 +133,20 @@ public class MoveMiddlewareToClassFixer : CodeFixProvider
                                             GenericName(Identifier("UseMiddleware"))
                                                 .WithTypeArgumentList(TypeArgumentList(
                                                     SingletonSeparatedList<TypeSyntax>(IdentifierName(middlewareClassName))))))))))))
-            });
+            };
 
-            var newRoot = root.ReplaceNode(compilationUnit, compilationUnit.WithMembers(middlewareClassDeclarations));
-            newRoot = newRoot.ReplaceNode(invocationExpression, registerMiddlewareInvocation);
+            // TODO: Only add the using statement if it's required
+            var newRoot = compilationUnit
+                .ReplaceNode(invocationExpression, registerMiddlewareInvocation)
+                //.AddUsings(
+                //    UsingDirective(
+                //        QualifiedName(
+                //            QualifiedName(
+                //                IdentifierName("System"),
+                //            IdentifierName("Threading")),
+                //        IdentifierName("Tasks"))
+                //    ))
+                .AddMembers(middlewareClassDeclarations);
 
             return document.WithSyntaxRoot(newRoot);
         }
