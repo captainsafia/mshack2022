@@ -101,4 +101,12 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor AddKeyAttribute = new(
+        "MH014",
+        "Add a '@key' attribute",
+        "Consider adding '@key' attribute for elements rendered in a list",
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
 }

@@ -15,10 +15,21 @@
     <button @onclick="@(() => JS.InvokeVoidAsync("alert", index))">@i</button>
 }
 
+<br />
+
+@for (var i = _numItems; i > 0; i--)
+{
+    <span @key="i" id="@i">@i</span><br />
+}
+
+<button @onclick="() => _numItems++">Add item</button>
+
 <Counter />
 
 @code{
     [Parameter] // Removing this line should report a diagnostic.
     [SupplyParameterFromQuery]
     public string? Message { get; set; }
+
+    private int _numItems = 0;
 }

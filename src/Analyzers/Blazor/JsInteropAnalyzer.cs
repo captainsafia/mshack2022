@@ -22,7 +22,7 @@ public class JsInteropAnalyzer : DiagnosticAnalyzer
 
             if (!WellKnownTypes.TryCreate(compilation, out var wellKnownTypes, out var failedType))
             {
-                Debug.Fail($"{failedType} could not be found.");
+                //Debug.Fail($"{failedType} could not be found.");
                 return;
             }
 
@@ -38,7 +38,7 @@ public class JsInteropAnalyzer : DiagnosticAnalyzer
 
                 if (containingSymbol is IMethodSymbol containingMethod &&
                     operationAnalysisContext.Operation is IInvocationOperation invocation &&
-                    wellKnownTypes.OnInitializedAsync.IsOverriddenBy(containingMethod) &&
+                    wellKnownTypes.ComponentBase_OnInitializedAsync.IsOverriddenBy(containingMethod) &&
                     SymbolEqualityComparer.Default.Equals(wellKnownTypes.IJSRuntime, invocation.GetInstanceType()))
                 {
                     operationAnalysisContext.ReportDiagnostic(Diagnostic.Create(

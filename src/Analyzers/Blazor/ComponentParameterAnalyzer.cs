@@ -90,7 +90,7 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
 
     private static bool ShouldContainingSymbolPermitParameterWriting(ISymbol containingSymbol, WellKnownTypes wellKnownTypes)
         => containingSymbol is IMethodSymbol methodSymbol
-        && (methodSymbol.MethodKind == MethodKind.Constructor || wellKnownTypes.SetParametersAsync.IsOverriddenBy(methodSymbol));
+        && (methodSymbol.MethodKind == MethodKind.Constructor || wellKnownTypes.ComponentBase_SetParametersAsync.IsOverriddenBy(methodSymbol));
 
     private static bool IsParameterProperty(IPropertySymbol property, WellKnownTypes wellKnownTypes)
         => property.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(
