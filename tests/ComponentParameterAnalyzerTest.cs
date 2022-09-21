@@ -17,7 +17,7 @@ class Program
 ";
 
     [Fact]
-    public async Task TriggersInComponentClass_SimpleAssignment()
+    public async Task WriteDiagnostic_TriggersInComponentClass_SimpleAssignment()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -31,14 +31,14 @@ class MyComponent : ComponentBase
 
     public void Bar()
     {{
-        [|Foo = 5|];
+        {{|MH002:Foo = 5|}};
     }}
 }}
 ");
     }
 
     [Fact]
-    public async Task TriggersInComponentClass_CompoundAssignment()
+    public async Task WriteDiagnostic_TriggersInComponentClass_CompoundAssignment()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -52,14 +52,14 @@ class MyComponent : ComponentBase
 
     public void Bar()
     {{
-        [|Foo += 5|];
+        {{|MH002:Foo += 5|}};
     }}
 }}
 ");
     }
 
     [Fact]
-    public async Task TriggersInComponentClass_CoalesceAssignment()
+    public async Task WriteDiagnostic_TriggersInComponentClass_CoalesceAssignment()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -73,14 +73,14 @@ class MyComponent : ComponentBase
 
     public void Bar()
     {{
-        [|Foo ??= new()|];
+        {{|MH002:Foo ??= new()|}};
     }}
 }}
 ");
     }
 
     [Fact]
-    public async Task TriggerInComponentClass_InheritFromExistingComponent()
+    public async Task WriteDiagnostic_TriggerInComponentClass_InheritFromExistingComponent()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -97,14 +97,14 @@ class MyDerivedComponent : MyComponent
 {{
     public void Bar()
     {{
-        [|Foo = 5|];
+        {{|MH002:Foo = 5|}};
     }}
 }}
 ");
     }
 
     [Fact]
-    public async Task DoesNotTriggerInComponentClass_NonParameterProperty()
+    public async Task WriteDiagnostic_DoesNotTriggerInComponentClass_NonParameterProperty()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -124,7 +124,7 @@ class MyComponent : ComponentBase
     }
 
     [Fact]
-    public async Task DoesNotTriggerInComponentClass_InlineAssignment()
+    public async Task WriteDiagnostic_DoesNotTriggerInComponentClass_InlineAssignment()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -140,7 +140,7 @@ class MyComponent : ComponentBase
     }
 
     [Fact]
-    public async Task DoesNotTriggerInComponentClass_AssignmentInConstructor()
+    public async Task WriteDiagnostic_DoesNotTriggerInComponentClass_AssignmentInConstructor()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -161,7 +161,7 @@ class MyComponent : ComponentBase
     }
 
     [Fact]
-    public async Task DoesNotTriggerInComponentClass_AssignmentInSetParametersAsync()
+    public async Task WriteDiagnostic_DoesNotTriggerInComponentClass_AssignmentInSetParametersAsync()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -184,7 +184,7 @@ class MyComponent : ComponentBase
     }
 
     [Fact]
-    public async Task DoesNotTriggerInComponentClass_AssignmentInSetParametersAsync_InheritFromExistingComponent()
+    public async Task WriteDiagnostic_DoesNotTriggerInComponentClass_AssignmentInSetParametersAsync_InheritFromExistingComponent()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -213,7 +213,7 @@ class MyDerivedComponent : MyComponent
     }
 
     [Fact]
-    public async Task DoesNotTriggerInNonComponentClass()
+    public async Task WriteDiagnostic_DoesNotTriggerInNonComponentClass()
     {
         await VerifyCS.VerifyAnalyzerAsync($@"
 using Microsoft.AspNetCore.Components;
@@ -229,6 +229,89 @@ class MyComponent
     {{
         Foo = 5;
     }}
+}}
+");
+    }
+
+    [Fact]
+    public async Task MissingAttributeDiagnostic_TriggersForSupplyParameterFromQueryAttribute()
+    {
+        await VerifyCS.VerifyAnalyzerAsync($@"
+using Microsoft.AspNetCore.Components;
+
+{ProgramMain}
+
+class MyComponent : ComponentBase
+{{
+    [{{|MH013:SupplyParameterFromQuery|}}]
+    public int Foo {{ get; set; }}
+}}
+");
+    }
+
+    [Fact]
+    public async Task MissingAttributeDiagnostic_TriggersForEditorRequiredAttribute()
+    {
+        await VerifyCS.VerifyAnalyzerAsync($@"
+using Microsoft.AspNetCore.Components;
+
+{ProgramMain}
+
+class MyComponent : ComponentBase
+{{
+    [{{|MH013:EditorRequired|}}]
+    public int Foo {{ get; set; }}
+}}
+");
+    }
+
+    [Fact]
+    public async Task MissingAttributeDiagnostic_DoesNotTriggerForOtherAttributes()
+    {
+        await VerifyCS.VerifyAnalyzerAsync($@"
+using Microsoft.AspNetCore.Components;
+using System;
+
+{ProgramMain}
+
+class MyComponent : ComponentBase
+{{
+    [Obsolete]
+    public int Foo {{ get; set; }}
+}}
+");
+    }
+
+    [Fact]
+    public async Task MissingAttributeDiagnostic_DoesNotTriggerWhenParameterAttributeIsPresent()
+    {
+        await VerifyCS.VerifyAnalyzerAsync($@"
+using Microsoft.AspNetCore.Components;
+
+{ProgramMain}
+
+class MyComponent : ComponentBase
+{{
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int Foo {{ get; set; }}
+}}
+");
+    }
+
+    [Fact]
+    public async Task MissingAttributeDiagnostic_DoesNotTriggerWhenCascadingParameterAttributeIsPresent()
+    {
+        await VerifyCS.VerifyAnalyzerAsync($@"
+using Microsoft.AspNetCore.Components;
+
+{ProgramMain}
+
+class MyComponent : ComponentBase
+{{
+    [CascadingParameter]
+    [SupplyParameterFromQuery]
+    public int Foo {{ get; set; }}
 }}
 ");
     }

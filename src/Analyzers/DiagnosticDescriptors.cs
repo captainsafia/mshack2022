@@ -93,4 +93,12 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor MissingParameterAttribute = new(
+        "MH013",
+        "Missing 'ParameterAttribute' attribute",
+        "Properties annotated with the '{0}' attribute must also have either a '[Parameter]' attribute or a '[CascadingParameter]' attribute",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }

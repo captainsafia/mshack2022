@@ -10,7 +10,8 @@ namespace MSHack2022.Analyzers.Blazor;
 public class ComponentParameterAnalyzer : DiagnosticAnalyzer
 {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        DiagnosticDescriptors.ComponentsShouldNotWriteToTheirOwnParameters);
+        DiagnosticDescriptors.ComponentsShouldNotWriteToTheirOwnParameters,
+        DiagnosticDescriptors.MissingParameterAttribute);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -25,6 +26,16 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
                 Debug.Fail($"{failedType} could not be found.");
                 return;
             }
+
+            var attributesQualifyingAsParameterAttributes = ImmutableHashSet.Create(
+                SymbolEqualityComparer.Default,
+                wellKnownTypes.ParameterAttribute,
+                wellKnownTypes.CascadingParameterAttribute);
+
+            var attributesRequiringParameterAttribute = ImmutableHashSet.Create(
+                SymbolEqualityComparer.Default,
+                wellKnownTypes.SupplyParameterFromQueryAttribute,
+                wellKnownTypes.EditorRequiredAttribute);
 
             compilationStartAnalysisContext.RegisterOperationAction(operationAnalysisContext =>
             {
@@ -47,28 +58,39 @@ public class ComponentParameterAnalyzer : DiagnosticAnalyzer
                         propertyReference.Property.Name));
                 }
             }, OperationKind.SimpleAssignment, OperationKind.CompoundAssignment, OperationKind.CoalesceAssignment);
+
+            compilationStartAnalysisContext.RegisterSymbolAction(symbolAnalysisContext =>
+            {
+                if (symbolAnalysisContext.Symbol is IPropertySymbol propertySymbol)
+                {
+                    var attributes = propertySymbol.GetAttributes();
+                    var hasParameterAttribute = attributes.Any(a => attributesQualifyingAsParameterAttributes.Contains(a.AttributeClass));
+
+                    if (!hasParameterAttribute)
+                    {
+                        foreach (var attribute in attributes)
+                        {
+                            if (attributesRequiringParameterAttribute.Contains(attribute.AttributeClass))
+                            {
+                                var cancellationToken = symbolAnalysisContext.CancellationToken;
+                                var attributeLocation = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken)?.GetLocation();
+                                var location = attributeLocation ?? propertySymbol.Locations.FirstOrDefault();
+
+                                symbolAnalysisContext.ReportDiagnostic(Diagnostic.Create(
+                                    DiagnosticDescriptors.MissingParameterAttribute,
+                                    location,
+                                    attribute.AttributeClass!.Name));
+                            }
+                        }
+                    }
+                }
+            }, SymbolKind.Property);
         });
     }
 
     private static bool ShouldContainingSymbolPermitParameterWriting(ISymbol containingSymbol, WellKnownTypes wellKnownTypes)
-    {
-        if (containingSymbol is not IMethodSymbol methodSymbol)
-        {
-            return false;
-        }
-
-        if (methodSymbol.MethodKind == MethodKind.Constructor)
-        {
-            return true;
-        }
-
-        if (wellKnownTypes.SetParametersAsync.IsOverriddenBy(methodSymbol))
-        {
-            return true;
-        }
-
-        return false;
-    }
+        => containingSymbol is IMethodSymbol methodSymbol
+        && (methodSymbol.MethodKind == MethodKind.Constructor || wellKnownTypes.SetParametersAsync.IsOverriddenBy(methodSymbol));
 
     private static bool IsParameterProperty(IPropertySymbol property, WellKnownTypes wellKnownTypes)
         => property.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(

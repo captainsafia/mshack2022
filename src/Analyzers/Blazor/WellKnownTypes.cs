@@ -7,6 +7,9 @@ internal sealed class WellKnownTypes
 {
     public INamedTypeSymbol ComponentBase { get; private init; } = default!;
     public INamedTypeSymbol ParameterAttribute { get; private init; } = default!;
+    public INamedTypeSymbol CascadingParameterAttribute { get; private init; } = default!;
+    public INamedTypeSymbol SupplyParameterFromQueryAttribute { get; private init; } = default!;
+    public INamedTypeSymbol EditorRequiredAttribute { get; private init; } = default!;
     public IMethodSymbol SetParametersAsync { get; private init; } = default!;
     public IMethodSymbol OnInitializedAsync { get; private init; } = default!;
     public INamedTypeSymbol IJSRuntime { get; private init; } = default!;
@@ -29,6 +32,27 @@ internal sealed class WellKnownTypes
         if (compilation.GetTypeByMetadataName(ParameterAttribute) is not { } parameterAttribute)
         {
             failedType = ParameterAttribute;
+            return false;
+        }
+
+        const string CascadingParameterAttribute = "Microsoft.AspNetCore.Components.CascadingParameterAttribute";
+        if (compilation.GetTypeByMetadataName(CascadingParameterAttribute) is not { } cascadingParameterAttribute)
+        {
+            failedType = CascadingParameterAttribute;
+            return false;
+        }
+
+        const string SupplyParameterFromQueryAttribute = "Microsoft.AspNetCore.Components.SupplyParameterFromQueryAttribute";
+        if (compilation.GetTypeByMetadataName(SupplyParameterFromQueryAttribute) is not { } supplyParameterFromQueryAttribute)
+        {
+            failedType = SupplyParameterFromQueryAttribute;
+            return false;
+        }
+
+        const string EditorRequiredAttribute = "Microsoft.AspNetCore.Components.EditorRequiredAttribute";
+        if (compilation.GetTypeByMetadataName(EditorRequiredAttribute) is not { } editorRequiredAttribute)
+        {
+            failedType = EditorRequiredAttribute;
             return false;
         }
 
@@ -64,6 +88,9 @@ internal sealed class WellKnownTypes
         {
             ComponentBase = componentBase,
             ParameterAttribute = parameterAttribute,
+            CascadingParameterAttribute = cascadingParameterAttribute,
+            SupplyParameterFromQueryAttribute = supplyParameterFromQueryAttribute,
+            EditorRequiredAttribute = editorRequiredAttribute,
             SetParametersAsync = setParametersAsync,
             OnInitializedAsync = onInitializedAsync,
             IJSRuntime = iJSRuntime,
