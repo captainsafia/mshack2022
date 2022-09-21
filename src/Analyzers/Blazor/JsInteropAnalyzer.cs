@@ -10,7 +10,8 @@ namespace MSHack2022.Analyzers.Blazor;
 public class JsInteropAnalyzer : DiagnosticAnalyzer
 {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        DiagnosticDescriptors.ShouldNotPerformJsInteropInOnInitializedAsync);
+        DiagnosticDescriptors.ShouldNotPerformJsInteropInOnInitializedAsync,
+        DiagnosticDescriptors.JSInvokableMethodsMustBePublic);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -47,6 +48,23 @@ public class JsInteropAnalyzer : DiagnosticAnalyzer
                 }
 
             }, OperationKind.Invocation);
+
+            compilationStartAnalysisContext.RegisterSymbolAction(symbolAnalysisContext =>
+            {
+                if (symbolAnalysisContext.Symbol is not IMethodSymbol methodSymbol)
+                {
+                    return;
+                }
+
+                if (methodSymbol.HasAttribute(wellKnownTypes.JSInvokableAttribute) &&
+                    methodSymbol.DeclaredAccessibility != Accessibility.Public)
+                {
+                    symbolAnalysisContext.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.JSInvokableMethodsMustBePublic,
+                        methodSymbol.Locations[0],
+                        methodSymbol.Name));
+                }
+            }, SymbolKind.Method);
         });
     }
 }
