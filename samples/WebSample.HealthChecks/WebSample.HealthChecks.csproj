@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebSample.Shared\WebSample.Shared.csproj" />
+  </ItemGroup>
+
+    <ItemGroup>
+	    <ProjectReference Include="..\..\src\Analyzers\MSHack2022.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	    <ProjectReference Include="..\..\src\Codefixers\MSHack2022.Codefixers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    </ItemGroup>
+
+</Project>

@@ -31,11 +31,11 @@ namespace WebSample.Controllers
         //}
 
         //// POST api/<ValuesController>
-        //[HttpPost]
-        //public async Task Post([FromBody] string value)
-        //{
-        //    await _processor.AddValue(value);
-        //}
+        [HttpPost]
+        public async Task Post([FromBody] string value)
+        {
+            await _processor.AddValue(value);
+        }
 
         //// PUT api/<ValuesController>/5
         //[HttpPut("{id}")]
