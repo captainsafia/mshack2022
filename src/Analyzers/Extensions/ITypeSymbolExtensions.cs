@@ -18,4 +18,9 @@ internal static class ITypeSymbolExtensions
 
         return false;
     }
+
+    public static bool Implements(this ITypeSymbol type, ITypeSymbol interfaceType)
+    {
+        return type.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, interfaceType));
+    }
 }
