@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Xunit;
-using VerifyCS = MSHack2022.Tests.CSharpAnalyzerVerifier<MSHack2022.Analyzers.MinimalNet7Analyzers>;
+using VerifyCS = MSHack2022.Tests.CSharpCodeFixVerifier<MSHack2022.Analyzers.MinimalNet7Analyzers, MSHack2022.Codefixers.RouteGroupFixer>;
 
 namespace MSHack2022.Tests;
 
@@ -141,7 +141,7 @@ public static class TestExtensionMethods
     [Fact]
     public async Task TriggersOnRoutesWithSamePrefix()
     {
-        await VerifyCS.VerifyAnalyzerAsync(@"
+        await VerifyCS.VerifyCodeFixAsync(@"
 using Microsoft.AspNetCore.Builder;
 
 public static class Program
@@ -158,11 +158,37 @@ public static class Program
             return ""Hello world!"";
         })|};
 
-        {|MH008:app.MapGet(""/mh/002"", () =>
+        app.MapGet(""/mh/002"", () =>
         {
             int i = 42;
             return ""Hello world!"";
-        })|};
+        });
+
+        app.Run();
+    }
+}
+", @"
+using Microsoft.AspNetCore.Builder;
+
+public static class Program
+{
+    static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        var app = builder.Build();
+
+        app.MapGet(""/mh/001"", () => 
+        {
+            int i = 42;
+            return ""Hello world!"";
+        });
+
+        app.MapGet(""/mh/002"", () =>
+        {
+            int i = 42;
+            return ""Hello world!"";
+        });
 
         app.Run();
     }

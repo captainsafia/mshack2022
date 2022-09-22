@@ -35,7 +35,7 @@ public partial class MinimalNet7Analyzers : DiagnosticAnalyzer
             context.RegisterSemanticModelAction(context =>
             {
                 var rootNode = context.SemanticModel.SyntaxTree.GetRoot();
-                var encounteredRoutes = new Dictionary<string, List<Location>>();
+                var encounteredRoutes = ImmutableDictionary.CreateBuilder<string, List<Location>>();
                 foreach (var node in rootNode.DescendantNodes())
                 {
                     if (node.IsKind(SyntaxKind.InvocationExpression))
@@ -72,14 +72,12 @@ public partial class MinimalNet7Analyzers : DiagnosticAnalyzer
                     {
                         continue;
                     }
-                    foreach (var location in items.Value)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(
-                            DiagnosticDescriptors.RecommendUsingRouteGroups,
-                            location,
-                            items.Key
-                        ));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.RecommendUsingRouteGroups,
+                        location: items.Value[0],
+                        additionalLocations: items.Value.Skip(1).ToArray(),
+                        messageArgs: new[] { items.Key }
+                    ));
                 }
             });
 
