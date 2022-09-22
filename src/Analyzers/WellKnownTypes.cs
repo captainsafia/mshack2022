@@ -57,8 +57,18 @@ namespace MSHack2022.Analyzers
             const string HttpMethodAttribute = "Microsoft.AspNetCore.Mvc.Routing.HttpMethodAttribute";
             if (compilation.GetTypeByMetadataName(HttpMethodAttribute) is not { } httpMethodAttribute)
             {
+                failedType = HttpMethodAttribute;
                 return false;
             }
+
+            const string IHealthCheck = "Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck";
+            if (compilation.GetTypeByMetadataName(IHealthCheck) is not { } iHealthCheck)
+            {
+                failedType = IHealthCheck;
+                return false;
+            }
+
+            var checkHealthAsyncBaseMethod = (IMethodSymbol)iHealthCheck.GetMembers("CheckHealthAsync").Single();
 
             wellKnownTypes = new WellKnownTypes
             {
@@ -68,7 +78,9 @@ namespace MSHack2022.Analyzers
                 ServiceProviderExtensions = serviceProviderExtensions,
                 JwtBearerExtensions = jwtBearerExtensions,
                 EndpointNameAttribute = endpointNameAttribute,
-                HttpMethodAttribute = httpMethodAttribute
+                HttpMethodAttribute = httpMethodAttribute,
+                IHealthCheck = iHealthCheck,
+                IHealthCheck_CheckHealthAsyncBaseMethod = checkHealthAsyncBaseMethod,
             };
 
             failedType = null;
@@ -82,5 +94,7 @@ namespace MSHack2022.Analyzers
         public INamedTypeSymbol JwtBearerExtensions { get; private set; } = null!;
         public INamedTypeSymbol EndpointNameAttribute { get; private set; } = null!;
         public INamedTypeSymbol HttpMethodAttribute { get; private set; } = null!;
+        public INamedTypeSymbol IHealthCheck { get; private set; } = null!;
+        public IMethodSymbol IHealthCheck_CheckHealthAsyncBaseMethod { get; private set; } = null!;
     }
 }
