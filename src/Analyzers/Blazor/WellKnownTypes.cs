@@ -10,6 +10,7 @@ internal sealed class WellKnownTypes
     public INamedTypeSymbol CascadingParameterAttribute { get; private init; } = default!;
     public INamedTypeSymbol SupplyParameterFromQueryAttribute { get; private init; } = default!;
     public INamedTypeSymbol EditorRequiredAttribute { get; private init; } = default!;
+    public INamedTypeSymbol JSInvokableAttribute { get; private init; } = default!;
     public IMethodSymbol SetParametersAsync { get; private init; } = default!;
     public IMethodSymbol OnInitializedAsync { get; private init; } = default!;
     public INamedTypeSymbol IJSRuntime { get; private init; } = default!;
@@ -56,6 +57,13 @@ internal sealed class WellKnownTypes
             return false;
         }
 
+        const string JSInvokableAttribute = "Microsoft.JSInterop.JSInvokableAttribute";
+        if (compilation.GetTypeByMetadataName(JSInvokableAttribute) is not { } jsInvokableAttribute)
+        {
+            failedType = JSInvokableAttribute;
+            return false;
+        }
+
         const string SetParametersAsync = "SetParametersAsync";
         if (componentBase.GetMembers().FirstOrDefault(m => m.MetadataName == SetParametersAsync) is not IMethodSymbol setParametersAsync)
         {
@@ -91,6 +99,7 @@ internal sealed class WellKnownTypes
             CascadingParameterAttribute = cascadingParameterAttribute,
             SupplyParameterFromQueryAttribute = supplyParameterFromQueryAttribute,
             EditorRequiredAttribute = editorRequiredAttribute,
+            JSInvokableAttribute = jsInvokableAttribute,
             SetParametersAsync = setParametersAsync,
             OnInitializedAsync = onInitializedAsync,
             IJSRuntime = iJSRuntime,

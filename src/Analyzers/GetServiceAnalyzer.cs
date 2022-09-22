@@ -87,7 +87,6 @@ public partial class GetServiceAnalyzer : DiagnosticAnalyzer
                     }
                 }
 
-
                 if (HasGetServiceCall(wellKnownTypes, methodBody))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.GetService, delegateCreation.Syntax.GetLocation()));

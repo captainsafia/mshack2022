@@ -12,78 +12,85 @@ public partial class GetServiceAnalyzerTest
     [Fact]
     public async Task TriggersOnNonGenericGetService()
     {
-        await VerifyCS.VerifyAnalyzerAsync(@"
-using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
+        await VerifyCS.VerifyAnalyzerAsync(
+            """
+            using System;
+            using Microsoft.AspNetCore.Http;
+            using Microsoft.AspNetCore.Builder;
+            using Microsoft.Extensions.Hosting;
 
-class Program
-{
-    static void Main()
-    {
-        var app = WebApplication.Create();
+            var app = WebApplication.Create();
 
-        app.MapGet(""/get"", {|#0:(HttpContext context) => 
-        {
-            var hostEnvironment = (IHostEnvironment)context.RequestServices.GetService(typeof(IHostEnvironment))!;
-            return $""Hello from '{hostEnvironment.ApplicationName}'!"";
-        }|});
-    }
-}
-", new DiagnosticResult(DiagnosticDescriptors.GetService).WithLocation(0));
+            app.MapGet("/get", {|MH004:(HttpContext context) => 
+            {
+                var hostEnvironment = (IHostEnvironment)context.RequestServices.GetService(typeof(IHostEnvironment))!;
+                return $"Hello from '{hostEnvironment.ApplicationName}'!";
+            }|});
+            """);
     }
 
     [Fact]
     public async Task TriggersOnGenericGetService()
     {
-        await VerifyCS.VerifyAnalyzerAsync(@"
-using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+        await VerifyCS.VerifyAnalyzerAsync(
+            """
+            using System;
+            using Microsoft.AspNetCore.Http;
+            using Microsoft.AspNetCore.Builder;
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
 
-class Program
-{
-    static void Main()
-    {
-        var app = WebApplication.Create();
+            var app = WebApplication.Create();
 
-        app.MapGet(""/get"", {|#0:(HttpContext context) => 
-        {
-            var hostEnvironment = context.RequestServices.GetService<IHostEnvironment>()!;
-            return $""Hello from '{hostEnvironment.ApplicationName}'!"";
-        }|});
+            app.MapGet("/get", {|MH004:(HttpContext context) => 
+            {
+                var hostEnvironment = context.RequestServices.GetService<IHostEnvironment>()!;
+                return $"Hello from '{hostEnvironment.ApplicationName}'!";
+            }|});
+            """);
     }
-}
-", new DiagnosticResult(DiagnosticDescriptors.GetService).WithLocation(0));
-    }
-
 
     [Fact]
     public async Task TriggersOnGenericGetRequiredService()
     {
-        await VerifyCS.VerifyAnalyzerAsync(@"
-using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+        await VerifyCS.VerifyAnalyzerAsync(
+            """
+            using System;
+            using Microsoft.AspNetCore.Http;
+            using Microsoft.AspNetCore.Builder;
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
 
-class Program
-{
-    static void Main()
-    {
-        var app = WebApplication.Create();
+            var app = WebApplication.Create();
 
-        app.MapGet(""/get"", {|#0:(HttpContext context) => 
-        {
-            var hostEnvironment = context.RequestServices.GetRequiredService<IHostEnvironment>();
-            return $""Hello from '{hostEnvironment.ApplicationName}'!"";
-        }|});
+            app.MapGet("/get", {|MH004:(HttpContext context) => 
+            {
+                var hostEnvironment = context.RequestServices.GetRequiredService<IHostEnvironment>()!;
+                return $"Hello from '{hostEnvironment.ApplicationName}'!";
+            }|});
+            """);
     }
-}
-", new DiagnosticResult(DiagnosticDescriptors.GetService).WithLocation(0));
+
+    [Fact]
+    public async Task TriggersOnGenericGetRequiredServiceInMethodGroup()
+    {
+        await VerifyCS.VerifyAnalyzerAsync(
+            """
+            using System;
+            using Microsoft.AspNetCore.Http;
+            using Microsoft.AspNetCore.Builder;
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
+
+            var app = WebApplication.Create();
+
+            app.MapGet("/get", {|MH004:Hello|});
+
+            string Hello(HttpContext context)
+            {
+                var hostEnvironment = context.RequestServices.GetRequiredService<IHostEnvironment>()!;
+                return $"Hello from '{hostEnvironment.ApplicationName}'!";
+            }
+            """);
     }
 }

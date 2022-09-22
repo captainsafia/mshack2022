@@ -101,9 +101,16 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
-
-    public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
+    public static readonly DiagnosticDescriptor JSInvokableMethodsMustBePublic = new(
         "MH014",
+        "Methods marked with '[JSInvokable]' must be public",
+        "The method '{0}' must be public because it is annotated with a '[JSInvokable]' attribute",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
+        "MH015",
         "Api Method should have health check coverage",
         "Api Method should have health check coverage by an implementation of IHealthCheck",
         "Usage",

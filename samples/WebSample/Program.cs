@@ -22,7 +22,7 @@ app.MapGet("/mh/004", (HttpContext context) =>
     return $"Hello from application '{hostEnvironment.ApplicationName}'!";
 });
 
-app.MapGet("/mh/005", (ref string s) =>
+app.MapGet("/mh/005", (string s) =>
 {
     return "Hello world!";
 });

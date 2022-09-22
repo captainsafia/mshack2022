@@ -17,6 +17,7 @@ This repository contains a collection of analyzers developed during MSHack 2022,
 | MH011         | Errors when returning a by-ref value in a request delegate. |
 | MH012         | Suggest users put RouteValues in request delegate arguments instead of accessing the dictionary. |
 | MH013         | Warns when the `[SupplyParameterFromQuery]` or `[EditorRequired]` attributes are used without either the `[Parameter]` or `[CascadingParameter]` attributes. |
+| MH014         | Code fixer and analyzer to make `[JSInvokable]` methods public. |
 
 ## Development Instructions
 
@@ -32,3 +33,13 @@ This repo contains the following directories:
 1. Clone the repo to your development machine using `git clone`.
 2. To run the tests in the repo, navigate to the `tests` directory and use `dotnet test`.
 3. To produce a NuGet package for the analyzers in this repo, navigate into the `src/Package` directory and run `dotnet pack`.
+
+## Installation Instructions
+
+The analyzers and codefixers in this repo are shipped in the [Hackalyzers](https://www.nuget.org/packages/Hackalyzers) package on NuGet. To get started with this analyzers, install the latest version of the package in your project of choice.
+
+```
+$ dotnet add package Hackalyzers
+```
+
+Note: you may need to restart any Visual Studio instances for the analyzers to take effect.
