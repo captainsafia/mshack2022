@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace MSHack2022.Analyzers
@@ -46,15 +47,35 @@ namespace MSHack2022.Analyzers
                 return false;
             }
 
+            const string HttpMethodAttribute = "Microsoft.AspNetCore.Mvc.Routing.HttpMethodAttribute";
+            if (compilation.GetTypeByMetadataName(HttpMethodAttribute) is not { } httpMethodAttribute)
+            {
+                failedType = HttpMethodAttribute;
+                return false;
+            }
+
+            const string IHealthCheck = "Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck";
+            if (compilation.GetTypeByMetadataName(IHealthCheck) is not { } iHealthCheck)
+            {
+                failedType = IHealthCheck;
+                return false;
+            }
+
+            var checkHealthAsyncBaseMethod = (IMethodSymbol)iHealthCheck.GetMembers("CheckHealthAsync").Single();
+
             const string JwtBearerExtensions = "Microsoft.Extensions.DependencyInjection.JwtBearerExtensions";
+            
             wellKnownTypes = new WellKnownTypes
             {
                 EndpointRouteBuilderExtensions = endpointRouteBuilderExtensions,
                 Delegate = @delegate,
                 IServiceProvider = iServiceProvider,
                 ServiceProviderExtensions = serviceProviderExtensions,
+                EndpointNameAttribute = endpointNameAttribute,
+                HttpMethodAttribute = httpMethodAttribute,
+                IHealthCheck = iHealthCheck,
+                IHealthCheck_CheckHealthAsyncBaseMethod = checkHealthAsyncBaseMethod,
                 JwtBearerExtensions = compilation.GetTypeByMetadataName(JwtBearerExtensions) ,
-                EndpointNameAttribute = endpointNameAttribute
             };
 
             failedType = null;
@@ -67,5 +88,8 @@ namespace MSHack2022.Analyzers
         public INamedTypeSymbol ServiceProviderExtensions { get; private set; } = null!;
         public INamedTypeSymbol? JwtBearerExtensions { get; private set; } = null!;
         public INamedTypeSymbol EndpointNameAttribute { get; private set; } = null!;
+        public INamedTypeSymbol HttpMethodAttribute { get; private set; } = null!;
+        public INamedTypeSymbol IHealthCheck { get; private set; } = null!;
+        public IMethodSymbol IHealthCheck_CheckHealthAsyncBaseMethod { get; private set; } = null!;
     }
 }

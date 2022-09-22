@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,5 +11,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4-beta1.22403.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0-1.final" />
+	  
   </ItemGroup>
 </Project>

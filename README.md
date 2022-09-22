@@ -18,6 +18,7 @@ This repository contains a collection of analyzers developed during MSHack 2022,
 | MH012         | Suggest users put RouteValues in request delegate arguments instead of accessing the dictionary. |
 | MH013         | Warns when the `[SupplyParameterFromQuery]` or `[EditorRequired]` attributes are used without either the `[Parameter]` or `[CascadingParameter]` attributes. |
 | MH014         | Code fixer and analyzer to make `[JSInvokable]` methods public. |
+| MH015         | Code fixer and analyzer to monitor the Health check coverage of API Controller methods. |
 
 ## Development Instructions
 

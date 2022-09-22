@@ -20,14 +20,6 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
-    public static readonly DiagnosticDescriptor WithName = new(
-        "MH006",
-        "Candidate for WithName CodeFix",
-        "Add a call to WithName(\"{0}\")",
-        "Usage",
-        DiagnosticSeverity.Hidden,
-        isEnabledByDefault: true);
-
     public static readonly DiagnosticDescriptor UseDotnetUserJwtsTool = new(
         "MH003",
         "Recommend using dotnet user-jwts tool",
@@ -50,6 +42,14 @@ public static class DiagnosticDescriptors
         "Found an argument with an invalid modifier like 'out', 'ref', or 'in'. Remove the modifier.",
         "Usage",
         DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor WithName = new(
+        "MH006",
+        "Candidate for WithName CodeFix",
+        "Add a call to WithName(\"{0}\")",
+        "Usage",
+        DiagnosticSeverity.Hidden,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ShouldNotPerformJsInteropInOnInitializedAsync = new(
@@ -101,7 +101,6 @@ public static class DiagnosticDescriptors
         "Usage",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
-
     public static readonly DiagnosticDescriptor JSInvokableMethodsMustBePublic = new(
         "MH014",
         "Methods marked with '[JSInvokable]' must be public",
@@ -110,4 +109,11 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
+        public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
+        "MH015",
+        "Api Method should have health check coverage",
+        "Api Method should have health check coverage by an implementation of IHealthCheck",
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 }
