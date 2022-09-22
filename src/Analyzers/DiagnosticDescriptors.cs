@@ -9,7 +9,7 @@ public static class DiagnosticDescriptors
         "Found the meaning of life",
         "Found a variable assigned to 42. Consider using the 'meaningOfLife' identifier.",
         "Usage",
-        DiagnosticSeverity.Error,
+        DiagnosticSeverity.Info,
         isEnabledByDefault: true);
 
     public static readonly DiagnosticDescriptor ComponentsShouldNotWriteToTheirOwnParameters = new(
@@ -98,7 +98,10 @@ public static class DiagnosticDescriptors
         "MH013",
         "Missing 'ParameterAttribute' attribute",
         "Properties annotated with the '{0}' attribute must also have either a '[Parameter]' attribute or a '[CascadingParameter]' attribute",
-    
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
+
     public static readonly DiagnosticDescriptor ShouldHaveHealthChecksCoverage = new(
         "MH014",
         "Api Method should have health check coverage",
